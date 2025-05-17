@@ -4,7 +4,7 @@ with pkgs;
 mkShell {
   buildInputs = [
     nodejs_22
-    yarn
+    corepack_22
     postgresql_16
     git
   ];
