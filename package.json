@@ -1,6 +1,7 @@
 {
   "name": "spendless-api",
   "type": "module",
+  "version": "1.0.0",
   "private": true,
   "author": "Dimas Bagus P <dimas.bagus.pm1@gmail.com>",
   "packageManager": "yarn@4.6.0",
