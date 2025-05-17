@@ -12,6 +12,7 @@
 #!.yarn/cache
 .pnp.*
 
+.direnv
 dist
 node_modules
 coverage
