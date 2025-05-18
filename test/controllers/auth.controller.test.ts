@@ -108,7 +108,7 @@ describe('AuthController', () => {
       expect(mockedAuthServiceMethods.register).toHaveBeenCalled();
 
       // Verify response status and error message
-      expect(mockResponseStatus).toHaveBeenCalledWith(401);
+      expect(mockResponseStatus).toHaveBeenCalledWith(409);
       expect(mockResponseJson).toHaveBeenCalledWith(
         expect.objectContaining({
           message: 'User with this email already exists',

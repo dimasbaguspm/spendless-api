@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { BadRequestException, UnauthorizedException } from '../helpers/exceptions/index.ts';
+import { BadRequestException, ConflictException, UnauthorizedException } from '../helpers/exceptions/index.ts';
 import { getErrorResponse } from '../helpers/http-response/index.ts';
 import { loginSchema, logoutSchema, refreshTokenSchema, registerSchema } from '../helpers/validation/auth.schema.ts';
 import { getZodErrorDetails, validate } from '../helpers/validation/index.ts';
@@ -30,7 +30,7 @@ export class AuthController {
       const result = await this.authService.register(data);
 
       if (!result) {
-        throw new UnauthorizedException('User with this email already exists');
+        throw new ConflictException('User with this email already exists');
       }
 
       res.status(201).json(result);

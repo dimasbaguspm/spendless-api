@@ -23,7 +23,5 @@ export const getCreatedResponse = (response: Response) => {
 };
 
 export const getNoContentResponse = (response: Response) => {
-  return response.status(204).json({
-    message: 'No content',
-  });
+  return response.status(204).send();
 };
