@@ -10,7 +10,6 @@
     /* Project Structure */
     "rootDir": ".",                                  /* Source code root directory */
     "outDir": "./dist",                                  /* Output directory for compiled code */
-    "baseUrl": "./src",                                  /* Enable imports from the src directory */
     
     /* Module Features */
     "resolveJsonModule": true,                           /* Enable importing .json files */
@@ -32,6 +31,6 @@
     /* Completeness */
     "skipLibCheck": true                                 /* Skip type checking all .d.ts files */
   },
-  "include": ["src/**/*", "jest.config.js", "tsup.config.ts", "eslint.config.js", "commitlint.config.js", ".versionrc.js"],  /* Only include files in the src directory */
+  "include": ["src/**/*", "jest.config.js", "tsup.config.ts", "eslint.config.js", "commitlint.config.js", ".versionrc.js", "drizzle.config.ts"],  /* Only include files in the src directory */
   "exclude": ["node_modules", "dist"]                    /* Exclude node_modules and build directory */
 }
