@@ -45,6 +45,7 @@ export default [
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/prefer-nullish-coalescing': 'warn',
       '@typescript-eslint/prefer-optional-chain': 'warn',
+      '@typescript-eslint/no-unsafe-call': 'off',
 
       // General rules
       'no-console': 'warn',

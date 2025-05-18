@@ -20,5 +20,8 @@ mkShell {
     export PGDATABASE="spendless"
     export PGPORT="5432"
     export DATABASE_URL="postgresql://$PGUSER@localhost:$PGPORT/$PGDATABASE"
+    export JWT_SECRET="development_jwt_secret_key_change_in_production"
+    export PORT="3000"
+    export NODE_ENV="development"
   '';
 }
