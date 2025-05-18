@@ -1,6 +1,3 @@
-// filepath: /home/kyrielle/development/spendless-api/src/services/auth.service.ts
-import jwt from 'jsonwebtoken';
-
 import { RegisterInput } from '../helpers/validation/auth.schema.ts';
 import { User } from '../models/schema.ts';
 
@@ -10,12 +7,10 @@ import { UserService } from './user.service.ts';
 export class AuthService {
   private userService: UserService;
   private tokenService: TokenService;
-  private jwtSecret: string;
 
   constructor() {
     this.userService = new UserService();
     this.tokenService = new TokenService();
-    this.jwtSecret = process.env.JWT_SECRET ?? 'your_super_secret_key_change_in_production';
   }
 
   /**
@@ -42,7 +37,7 @@ export class AuthService {
     }
 
     // Generate JWT access token
-    const token = this.generateToken(user);
+    const token = this.tokenService.generateAccessToken(user);
 
     // Generate refresh token
     const refreshToken = await this.tokenService.generateRefreshToken(user.id);
@@ -77,7 +72,7 @@ export class AuthService {
       const user = await this.userService.createUser(userData);
 
       // Generate JWT access token
-      const token = this.generateToken(user);
+      const token = this.tokenService.generateAccessToken(user);
 
       // Generate refresh token
       const refreshToken = await this.tokenService.generateRefreshToken(user.id);
@@ -125,7 +120,7 @@ export class AuthService {
       }
 
       // Generate new tokens
-      const newToken = this.generateToken(user);
+      const newToken = this.tokenService.generateAccessToken(user);
 
       // Generate new refresh token and revoke the old one
       const newRefreshToken = await this.tokenService.generateRefreshToken(user.id);
@@ -150,45 +145,6 @@ export class AuthService {
       return true;
     } catch {
       return false;
-    }
-  }
-
-  /**
-   * Generate JWT token
-   */
-  private generateToken(user: User): string {
-    const payload = {
-      sub: user.id,
-      email: user.email,
-    };
-
-    return jwt.sign(payload, this.jwtSecret, { expiresIn: '24h' });
-  }
-
-  /**
-   * Verify JWT token
-   */
-  verifyToken(token: string): { sub: number; email: string } | null {
-    try {
-      const decoded = jwt.verify(token, this.jwtSecret);
-
-      if (
-        typeof decoded === 'object' &&
-        decoded !== null &&
-        'sub' in decoded &&
-        'email' in decoded &&
-        typeof decoded.sub !== 'undefined' &&
-        typeof decoded.email === 'string'
-      ) {
-        return {
-          sub: Number(decoded.sub),
-          email: decoded.email,
-        };
-      }
-
-      return null;
-    } catch {
-      return null;
     }
   }
 }
