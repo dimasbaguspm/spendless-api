@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
@@ -8,7 +8,7 @@ import { Pool } from 'pg';
 
 // Get __dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = dirname(__filename);
 
 // Create a PostgreSQL connection pool
 const pool = new Pool({
@@ -21,7 +21,7 @@ const db = drizzle(pool);
 // Run migrations
 async function main() {
   console.log('Running migrations...');
-  await migrate(db, { migrationsFolder: path.join(__dirname, 'migrations') });
+  await migrate(db, { migrationsFolder: join(__dirname, 'migrations') });
   console.log('Migrations completed');
   await pool.end();
 }
