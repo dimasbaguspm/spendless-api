@@ -1,40 +1,30 @@
 import { z } from 'zod';
 
+import { NewCategory, UpdateCategory } from '../../models/schema.ts';
+import { typeAssertion, TypeEqualityGuard } from '../type-check/index.ts';
+
 // Schema for creating a category
 export const createCategorySchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  type: z.enum(['income', 'expense'], {
-    errorMap: () => ({ message: 'Type must be either "income" or "expense"' }),
-  }),
-  color: z.string().optional(),
+  groupId: z.number().int().positive('Group ID is required'),
+  parentId: z.number().int().nullable().optional(), // nullable in DB, so optional here
+  name: z.string().max(100, 'Name must be at most 100 characters').min(1, 'Name is required'),
+  note: z.string().nullable().optional(),
 });
 
 // Schema for updating a category
-export const updateCategorySchema = z.object({
-  name: z.string().min(1, 'Name is required').optional(),
-  type: z
-    .enum(['income', 'expense'], {
-      errorMap: () => ({ message: 'Type must be either "income" or "expense"' }),
-    })
-    .optional(),
-  color: z.string().optional(),
-});
+export const updateCategorySchema = createCategorySchema.partial();
 
 // Schema for category query parameters
 export const categoryQuerySchema = z.object({
-  type: z
-    .string()
-    .optional()
-    .transform((val) => (val === '' ? undefined : val))
-    .refine((val) => val === undefined || ['income', 'expense'].includes(val), {
-      message: 'Type must be either "income" or "expense"',
-    }),
+  id: z.number().int().positive().optional(),
+  groupId: z.number().int().positive().optional(),
+  parentId: z.number().int().nullable().optional(),
   name: z
     .string()
     .optional()
     .transform((val) => (val === '' ? undefined : val)),
-  pageNumber: z.coerce.number().min(1).default(1).optional(),
-  pageSize: z.coerce.number().min(1).default(25).optional(),
+  pageNumber: z.coerce.number().min(1).optional().default(1),
+  pageSize: z.coerce.number().min(1).optional().default(25),
   sortBy: z
     .string()
     .optional()
@@ -51,7 +41,17 @@ export const categoryQuerySchema = z.object({
     }),
 });
 
+// Schema for deleting a category
+export const deleteCategorySchema = z.object({
+  id: z.number().int().positive('Category ID is required'),
+});
+
 // Export types based on the schemas for use in controllers and services
 export type CreateCategoryInput = z.infer<typeof createCategorySchema>;
 export type UpdateCategoryInput = z.infer<typeof updateCategorySchema>;
 export type CategoryQueryInput = z.infer<typeof categoryQuerySchema>;
+export type DeleteCategoryInput = z.infer<typeof deleteCategorySchema>;
+
+// Ensure type compatibility between schemas and model types
+typeAssertion<TypeEqualityGuard<Omit<NewCategory, 'id' | 'createdAt' | 'updatedAt'>, CreateCategoryInput>>();
+typeAssertion<TypeEqualityGuard<Omit<UpdateCategory, 'id' | 'createdAt' | 'updatedAt'>, UpdateCategoryInput>>();

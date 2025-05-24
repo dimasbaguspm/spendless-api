@@ -1,19 +1,24 @@
-import express, { Router } from 'express';
+import { Router } from 'express';
 
-import { CategoryController } from '../controllers/category.controller.ts';
-import { authenticateJWT } from '../middleware/auth.middleware.ts';
+import {
+  listCategories,
+  createCategory,
+  getCategory,
+  updateCategory,
+  deleteCategory,
+  listCategoryTransactions,
+} from '../controllers/index.ts';
 
-const router: Router = express.Router();
-const categoryController = new CategoryController();
+const router = Router();
 
-// All routes require authentication
-router.use(authenticateJWT);
+// Category routes
+router.get('/', listCategories);
+router.post('/', createCategory);
+router.get('/:id', getCategory);
+router.patch('/:id', updateCategory);
+router.delete('/:id', deleteCategory);
 
-// Standard CRUD routes
-router.get('/', categoryController.getCategories.bind(categoryController));
-router.post('/', categoryController.createCategory.bind(categoryController));
-router.get('/:id', categoryController.getCategoryById.bind(categoryController));
-router.put('/:id', categoryController.updateCategory.bind(categoryController));
-router.delete('/:id', categoryController.deleteCategory.bind(categoryController));
+// Category transactions
+router.get('/:categoryId/transactions', listCategoryTransactions);
 
 export default router;

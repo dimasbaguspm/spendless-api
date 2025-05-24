@@ -1,157 +1,96 @@
 import { Request, Response } from 'express';
 
-import { BadRequestException, NotFoundException } from '../helpers/exceptions/index.ts';
+import { NotFoundException } from '../helpers/exceptions/index.ts';
 import { getErrorResponse } from '../helpers/http-response/index.ts';
-import {
-  createCategorySchema,
-  updateCategorySchema,
-  categoryQuerySchema,
-} from '../helpers/validation/category.schema.ts';
-import { getZodErrorDetails, validate } from '../helpers/validation/index.ts';
-import { CategoryService } from '../services/category.service.ts';
-import { TokenService } from '../services/token.service.ts';
+import { parseId } from '../helpers/parsers/index.ts';
+import { AccessTokenService } from '../services/authentication/access-token.service.ts';
+import { CategoryService } from '../services/database/category.service.ts';
 
-export class CategoryController {
-  private categoryService: CategoryService;
-  private tokenService: TokenService;
+const accessTokenService = new AccessTokenService();
+const categoryService = new CategoryService();
 
-  constructor() {
-    this.categoryService = new CategoryService();
-    this.tokenService = new TokenService();
+export async function listCategories(req: Request, res: Response) {
+  try {
+    const user = accessTokenService.getUserFromRequest(req);
+
+    // Add user's groupId to query filters
+    const filters = { ...req.query, groupId: user.groupId };
+    const categories = await categoryService.getMany(filters);
+
+    res.status(200).json(categories);
+  } catch (err) {
+    getErrorResponse(res, err);
   }
+}
 
-  /**
-   * Create a new category
-   */
-  async createCategory(req: Request, res: Response) {
-    try {
-      const { id: userId } = this.tokenService.getUserFromRequest(req);
+export async function createCategory(req: Request, res: Response) {
+  try {
+    const user = accessTokenService.getUserFromRequest(req);
 
-      const { data, error, success } = await validate(createCategorySchema, req?.body);
+    // Ensure the category is created for the user's group
+    const payload = { ...req.body, groupId: user.groupId };
 
-      if (!success) {
-        throw new BadRequestException('Validation error', {
-          errors: getZodErrorDetails(error),
-        });
-      }
+    const category = await categoryService.createSingle(payload);
 
-      const categoryData = {
-        ...data,
-        userId,
-      };
-
-      const result = await this.categoryService.createCategory(categoryData);
-
-      res.status(201).json(result);
-    } catch (error) {
-      getErrorResponse(res, error);
-    }
+    res.status(201).json(category);
+  } catch (err) {
+    getErrorResponse(res, err);
   }
+}
 
-  /**
-   * Get all categories for a user
-   */
-  async getCategories(req: Request, res: Response) {
-    try {
-      const { id: userId } = this.tokenService.getUserFromRequest(req);
+export async function getCategory(req: Request, res: Response) {
+  try {
+    const user = accessTokenService.getUserFromRequest(req);
 
-      const { data, error, success } = await validate(categoryQuerySchema, req.query);
+    const id = parseId(req.params.id);
+    const category = await categoryService.getSingle({ id, groupId: user.groupId });
 
-      if (!success) {
-        throw new BadRequestException('Validation error', {
-          errors: getZodErrorDetails(error),
-        });
-      }
-
-      const categories = await this.categoryService.getCategoriesByUserId(userId, {
-        type: data.type,
-        name: data.name,
-        sortBy: data.sortBy as 'name' | 'createdAt' | undefined,
-        sortOrder: data.sortOrder as 'asc' | 'desc' | undefined,
-        pageNumber: data.pageNumber,
-        pageSize: data.pageSize,
-      });
-
-      res.status(200).json(categories);
-    } catch (error) {
-      getErrorResponse(res, error);
+    if (!category) {
+      throw new NotFoundException('Category not found');
     }
+
+    res.status(200).json(category);
+  } catch (err) {
+    getErrorResponse(res, err);
   }
+}
 
-  /**
-   * Get a specific category by ID
-   */
-  async getCategoryById(req: Request, res: Response) {
-    try {
-      const categoryId = parseInt(req.params.id, 10);
+export async function updateCategory(req: Request, res: Response) {
+  try {
+    const user = accessTokenService.getUserFromRequest(req);
 
-      if (isNaN(categoryId)) throw new BadRequestException('Invalid category ID');
+    const id = parseId(req.params.id);
 
-      const { id: userId } = this.tokenService.getUserFromRequest(req);
-
-      const category = await this.categoryService.getCategoryById(categoryId, { userId });
-
-      if (!category) {
-        throw new NotFoundException('Category not found');
-      }
-
-      res.status(200).json(category);
-    } catch (error) {
-      getErrorResponse(res, error);
+    // Verify category belongs to user's group
+    const existingCategory = await categoryService.getSingle({ id, groupId: user.groupId });
+    if (!existingCategory) {
+      throw new NotFoundException('Category not found');
     }
+
+    const category = await categoryService.updateSingle(id, req.body);
+
+    res.status(200).json(category);
+  } catch (err) {
+    getErrorResponse(res, err);
   }
+}
 
-  /**
-   * Update a category
-   */
-  async updateCategory(req: Request, res: Response) {
-    try {
-      const categoryId = parseInt(req.params.id, 10);
+export async function deleteCategory(req: Request, res: Response) {
+  try {
+    const user = accessTokenService.getUserFromRequest(req);
 
-      if (isNaN(categoryId)) throw new BadRequestException('Invalid category ID');
+    const id = parseId(req.params.id);
 
-      const { id: userId } = this.tokenService.getUserFromRequest(req);
-
-      const { data, error, success } = await validate(updateCategorySchema, req?.body);
-
-      if (!success) {
-        throw new BadRequestException('Validation error', {
-          errors: getZodErrorDetails(error),
-        });
-      }
-
-      const updatedCategory = await this.categoryService.updateCategory(categoryId, userId, data);
-
-      if (!updatedCategory) {
-        throw new NotFoundException('Category not found');
-      }
-
-      res.status(200).json(updatedCategory);
-    } catch (error) {
-      getErrorResponse(res, error);
+    // Verify category belongs to user's group
+    const existingCategory = await categoryService.getSingle({ id, groupId: user.groupId });
+    if (!existingCategory) {
+      throw new NotFoundException('Category not found');
     }
-  }
 
-  /**
-   * Delete a category
-   */
-  async deleteCategory(req: Request, res: Response) {
-    try {
-      const categoryId = parseInt(req.params.id, 10);
+    const category = await categoryService.deleteSingle(id);
 
-      if (isNaN(categoryId)) throw new BadRequestException('Invalid category ID');
-
-      const { id: userId } = this.tokenService.getUserFromRequest(req);
-
-      const isDeleted = await this.categoryService.deleteCategory(categoryId, userId);
-
-      if (!isDeleted) {
-        throw new NotFoundException('Category not found');
-      }
-
-      res.status(200).json({ message: 'Category deleted successfully' });
-    } catch (error) {
-      getErrorResponse(res, error);
-    }
+    res.status(200).json(category);
+  } catch (err) {
+    getErrorResponse(res, err);
   }
 }

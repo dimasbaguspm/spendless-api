@@ -1,12 +1,47 @@
-import { pgTable, serial, varchar, timestamp, text, boolean, integer, decimal } from 'drizzle-orm/pg-core';
+import { pgTable, serial, varchar, timestamp, text, boolean, integer, decimal, date } from 'drizzle-orm/pg-core';
+
+import { PaginatedResponse } from '../types/index.ts';
+
+export const groups = pgTable('groups', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 255 }).notNull(),
+  defaultCurrency: varchar('default_currency', { length: 3 }).notNull(),
+  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
+});
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
+  groupId: integer('group_id')
+    .notNull()
+    .references(() => groups.id, { onDelete: 'cascade' }),
   email: varchar('email', { length: 255 }).notNull().unique(),
-  password: varchar('password', { length: 255 }).notNull(),
-  firstName: varchar('first_name', { length: 255 }),
-  lastName: varchar('last_name', { length: 255 }),
-  isActive: boolean('is_active').default(true).notNull(),
+  passwordHash: varchar('password_hash', { length: 255 }).notNull(),
+  name: varchar('name', { length: 255 }).notNull(),
+  isActive: boolean('is_active').notNull(),
+  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
+});
+
+export const accounts = pgTable('accounts', {
+  id: serial('id').primaryKey(),
+  groupId: integer('group_id')
+    .notNull()
+    .references(() => groups.id, { onDelete: 'cascade' }),
+  name: varchar('name', { length: 255 }).notNull(),
+  type: varchar('type', { length: 50 }).notNull(), // debit, credit, etc.
+  note: text('note'),
+  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
+});
+
+export const accountLimits = pgTable('account_limits', {
+  id: serial('id').primaryKey(),
+  accountId: integer('account_id')
+    .notNull()
+    .references(() => accounts.id, { onDelete: 'cascade' }),
+  period: varchar('period', { length: 20 }).notNull(), // 'month' or 'week'
+  limit: decimal('limit', { precision: 14, scale: 2 }).$type<number>().notNull(),
   createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
 });
@@ -23,55 +58,89 @@ export const refreshTokens = pgTable('refresh_tokens', {
   replacedByToken: text('replaced_by_token'),
 });
 
-export const userSessions = pgTable('user_sessions', {
-  id: serial('id').primaryKey(),
-  userId: integer('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  userAgent: text('user_agent'),
-  ipAddress: varchar('ip_address', { length: 45 }),
-  lastActive: timestamp('last_active', { mode: 'string' }).defaultNow().notNull(),
-  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
-  expiresAt: timestamp('expires_at', { mode: 'string' }).notNull(),
-});
-
 export const categories = pgTable('categories', {
   id: serial('id').primaryKey(),
-  userId: integer('user_id').references(() => users.id, { onDelete: 'cascade' }),
+  groupId: integer('group_id')
+    .notNull()
+    .references(() => groups.id, { onDelete: 'cascade' }),
+  parentId: integer('parent_id'), // nullable, for nested categories
   name: varchar('name', { length: 100 }).notNull(),
-  type: varchar('type', { length: 20 }).notNull(), // 'income', 'expense', etc.
-  color: varchar('color', { length: 20 }),
+  note: text('note'),
+  createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
+});
+
+export const recurrences = pgTable('recurrences', {
+  id: serial('id').primaryKey(),
+  frequency: varchar('frequency', { length: 20 }).notNull(), // daily, weekly, monthly, yearly
+  interval: integer('interval').notNull(),
+  nextOccurrenceDate: date('next_occurrence_date').notNull(),
+  endDate: date('end_date'),
   createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
 });
 
 export const transactions = pgTable('transactions', {
   id: serial('id').primaryKey(),
-  userId: integer('user_id')
+  groupId: integer('group_id')
     .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
+    .references(() => groups.id, { onDelete: 'cascade' }),
+  accountId: integer('account_id')
+    .notNull()
+    .references(() => accounts.id, { onDelete: 'restrict' }),
   categoryId: integer('category_id')
     .notNull()
-    .references(() => categories.id, { onDelete: 'restrict' }),
-  amount: decimal('amount', { precision: 14, scale: 2 }).notNull(),
+    .references(() => categories.id),
+  createdByUserId: integer('created_by_user_id')
+    .notNull()
+    .references(() => users.id),
+  amount: decimal('amount', { precision: 14, scale: 2 }).$type<number>().notNull(),
+  currency: varchar('currency', { length: 3 }).notNull(),
+  date: date('date', { mode: 'string' }).notNull(), // date of the transaction
   note: text('note'),
-  date: timestamp('date', { mode: 'string' }).notNull(),
+  recurrenceId: integer('recurrence_id')
+    .$type<number>()
+    .references(() => recurrences.id),
   createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
 });
 
 // Define types
+export type Group = typeof groups.$inferSelect;
+export type PagedGroups = PaginatedResponse<Group>;
+export type NewGroup = typeof groups.$inferInsert;
+export type UpdateGroup = Partial<NewGroup>;
+
 export type User = typeof users.$inferSelect;
+export type PagedUsers = PaginatedResponse<User>;
 export type NewUser = typeof users.$inferInsert;
+export type UpdateUser = Partial<NewUser>;
+
+export type Account = typeof accounts.$inferSelect;
+export type PagedAccounts = PaginatedResponse<Account>;
+export type NewAccount = typeof accounts.$inferInsert;
+export type UpdateAccount = Partial<NewAccount>;
+
+export type AccountLimit = typeof accountLimits.$inferSelect;
+export type PagedAccountLimits = PaginatedResponse<AccountLimit>;
+export type NewAccountLimit = typeof accountLimits.$inferInsert;
+export type UpdateAccountLimit = Partial<NewAccountLimit>;
 
 export type RefreshToken = typeof refreshTokens.$inferSelect;
 export type NewRefreshToken = typeof refreshTokens.$inferInsert;
-
-export type UserSession = typeof userSessions.$inferSelect;
-export type NewUserSession = typeof userSessions.$inferInsert;
+export type UpdateRefreshToken = Partial<NewRefreshToken>;
 
 export type Category = typeof categories.$inferSelect;
+export type PagedCategories = PaginatedResponse<Category>;
 export type NewCategory = typeof categories.$inferInsert;
+export type UpdateCategory = Partial<NewCategory>;
+
+export type Recurrence = typeof recurrences.$inferSelect;
+export type PagedRecurrences = PaginatedResponse<Recurrence>;
+export type NewRecurrence = typeof recurrences.$inferInsert;
+export type UpdateRecurrence = Partial<NewRecurrence>;
 
 export type Transaction = typeof transactions.$inferSelect;
+export type PagedTransactions = PaginatedResponse<Transaction>;
 export type NewTransaction = typeof transactions.$inferInsert;
+export type UpdateTransaction = Partial<NewTransaction>;
