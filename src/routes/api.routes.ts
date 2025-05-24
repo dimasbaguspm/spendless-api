@@ -5,6 +5,7 @@ import { authenticateJWT } from '../middleware/auth.middleware.ts';
 import accountRoutes from './account.routes.ts';
 import authRoutes from './auth.routes.ts';
 import categoryRoutes from './category.routes.ts';
+import docsRoutes from './docs.routes.ts';
 import groupRoutes from './group.routes.ts';
 import healthRoutes from './health.routes.ts';
 import indexRoutes from './index.routes.ts';
@@ -18,6 +19,7 @@ const router: Router = express.Router();
 router.use('/', indexRoutes);
 router.use('/health', healthRoutes);
 router.use('/auth', authRoutes);
+router.use('/docs', docsRoutes);
 
 // All routes below require authentication
 router.use(authenticateJWT);

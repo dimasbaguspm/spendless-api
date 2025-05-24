@@ -26,6 +26,43 @@ yarn install
 - `yarn lint`: Lint the code
 - `yarn check`: Type check the code
 
+## API Documentation
+
+### Swagger UI
+
+Interactive API documentation is available via Swagger UI when the server is running:
+
+- **Swagger UI**: http://localhost:3000/api/docs
+- **OpenAPI Spec (JSON)**: http://localhost:3000/api/docs/swagger.json
+
+The Swagger documentation includes:
+- Complete API endpoint documentation
+- Request/response schemas
+- Authentication requirements
+- Interactive testing interface
+- Example requests and responses
+
+### Authentication
+
+Most endpoints require authentication using JWT Bearer tokens. To use protected endpoints in Swagger UI:
+
+1. Register a new user or login via the `/auth/register` or `/auth/login` endpoints
+2. Copy the `accessToken` from the response
+3. Click the "Authorize" button in Swagger UI
+4. Enter `Bearer <your-access-token>` in the authorization field
+5. Click "Authorize" to apply the token to all requests
+
+### Available Endpoints
+
+- **Authentication**: `/api/auth/*` - User registration and login
+- **Health Check**: `/api/health` - Service health status
+- **Accounts**: `/api/accounts/*` - Account management
+- **Categories**: `/api/categories/*` - Category management
+- **Transactions**: `/api/transactions/*` - Transaction management
+- **Groups**: `/api/groups/*` - Group management
+- **Users**: `/api/users/*` - User management
+- **Summary**: `/api/summary/*` - Financial summaries and reports
+
 ## Release Process and Changelog Management
 
 This project uses [standard-version](https://github.com/conventional-changelog/standard-version) to automate versioning and changelog generation.
