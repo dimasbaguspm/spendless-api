@@ -63,13 +63,13 @@ export class TransactionService implements DatabaseServiceSchema<Transaction> {
       .orderBy(order)
       .limit(pageSize)
       .offset((pageNumber - 1) * pageSize)
-      .prepare('pagedQuery');
+      .prepare('TRANSACTION_PAGED_QUERY');
 
     const totalQuery = db
       .select()
       .from(transactions)
       .where(conditions.length ? and(...conditions) : undefined)
-      .prepare('totalQuery');
+      .prepare('TRANSACTION_TOTAL_QUERY');
 
     const [pagedData, totalData] = await Promise.all([pagedQuery.execute(), totalQuery.execute()]);
 

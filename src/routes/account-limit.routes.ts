@@ -15,7 +15,7 @@ const router = Router({ mergeParams: true }); // mergeParams allows access to pa
  * /accounts/{accountId}/limits:
  *   get:
  *     summary: List account limits
- *     description: Get all spending limits for a specific account
+ *     description: Get all spending limits for a specific account with optional filtering, pagination, and sorting
  *     tags: [Account Limits]
  *     security:
  *       - bearerAuth: []
@@ -24,41 +24,59 @@ const router = Router({ mergeParams: true }); // mergeParams allows access to pa
  *         name: accountId
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *         description: Account ID
+ *       - in: query
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         description: Filter by limit ID
+ *       - in: query
+ *         name: groupId
+ *         schema:
+ *           type: integer
+ *         description: Filter by group ID
+ *       - in: query
+ *         name: period
+ *         schema:
+ *           type: string
+ *           enum: [daily, weekly, monthly, yearly]
+ *         description: Filter by limit period
+ *       - in: query
+ *         name: pageNumber
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: pageSize
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 25
+ *         description: Number of items per page
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum: [period, limit, createdAt]
+ *         description: Field to sort by
+ *       - in: query
+ *         name: sortOrder
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: asc
+ *         description: Sort order
  *     responses:
  *       200:
- *         description: Account limits retrieved successfully
+ *         description: Paginated list of account limits
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 limits:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                       name:
- *                         type: string
- *                       amount:
- *                         type: number
- *                         format: decimal
- *                       period:
- *                         type: string
- *                         enum: [daily, weekly, monthly, yearly]
- *                       accountId:
- *                         type: string
- *                       groupId:
- *                         type: string
- *                       createdAt:
- *                         type: string
- *                         format: date-time
- *                       updatedAt:
- *                         type: string
- *                         format: date-time
+ *               $ref: '#/components/schemas/PaginatedResponse'
  *       401:
  *         description: Unauthorized - invalid or missing token
  *         content:
@@ -100,7 +118,7 @@ router.get('/', listAccountLimits);
  *         name: accountId
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *         description: Account ID
  *     requestBody:
  *       required: true
@@ -109,24 +127,19 @@ router.get('/', listAccountLimits);
  *           schema:
  *             type: object
  *             required:
- *               - name
- *               - amount
  *               - period
+ *               - limit
  *             properties:
- *               name:
- *                 type: string
- *                 description: Limit name
- *                 example: "Monthly Food Budget"
- *               amount:
- *                 type: number
- *                 format: decimal
- *                 description: Limit amount
- *                 example: 500.00
  *               period:
  *                 type: string
  *                 enum: [daily, weekly, monthly, yearly]
  *                 description: Limit period
  *                 example: "monthly"
+ *               limit:
+ *                 type: number
+ *                 multipleOf: 0.01
+ *                 description: Limit amount (in cents or smallest currency unit)
+ *                 example: 50000
  *     responses:
  *       201:
  *         description: Account limit created successfully

@@ -31,16 +31,18 @@ const router = Router();
  *                 properties:
  *                   name:
  *                     type: string
+ *                     maxLength: 255
  *                     description: User's full name
  *                     example: "John Doe"
  *                   email:
  *                     type: string
  *                     format: email
+ *                     maxLength: 255
  *                     description: User's email address
  *                     example: "john.doe@example.com"
  *                   password:
  *                     type: string
- *                     format: password
+ *                     minLength: 8
  *                     description: User's password (minimum 8 characters)
  *                     example: "securePassword123"
  *               group:
@@ -50,12 +52,16 @@ const router = Router();
  *                 properties:
  *                   name:
  *                     type: string
+ *                     maxLength: 255
  *                     description: Group name
  *                     example: "Doe Family Budget"
- *                   description:
+ *                   defaultCurrency:
  *                     type: string
- *                     description: Group description
- *                     example: "Budget management for the Doe family"
+ *                     minLength: 3
+ *                     maxLength: 3
+ *                     nullable: true
+ *                     description: Default currency for the group (3-letter code)
+ *                     example: "USD"
  *     responses:
  *       201:
  *         description: User registered successfully

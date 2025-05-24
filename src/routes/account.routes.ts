@@ -19,17 +19,64 @@ const router = Router();
  * /accounts:
  *   get:
  *     summary: List all accounts
- *     description: Retrieve all accounts for the authenticated user's group
+ *     description: Retrieve all accounts for the authenticated user's group with optional filtering, pagination, and sorting
  *     tags: [Accounts]
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         description: Filter by account ID
+ *       - in: query
+ *         name: groupId
+ *         schema:
+ *           type: integer
+ *         description: Filter by group ID
+ *       - in: query
+ *         name: name
+ *         schema:
+ *           type: string
+ *         description: Filter by account name
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *         description: Filter by account type
+ *       - in: query
+ *         name: pageNumber
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: pageSize
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 25
+ *         description: Number of items per page
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum: [name, type, createdAt]
+ *         description: Field to sort by
+ *       - in: query
+ *         name: sortOrder
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: asc
+ *         description: Sort order
  *     responses:
  *       200:
- *         description: List of accounts
+ *         description: Paginated list of accounts
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Account'
+ *               $ref: '#/components/schemas/PaginatedResponse'
  *       401:
  *         description: Unauthorized
  *         content:
@@ -55,22 +102,22 @@ const router = Router();
  *             required:
  *               - name
  *               - type
- *               - balance
  *             properties:
  *               name:
  *                 type: string
+ *                 maxLength: 255
  *                 description: Account name
  *                 example: "Main Checking Account"
  *               type:
  *                 type: string
- *                 enum: [savings, checking, credit, cash]
+ *                 maxLength: 50
  *                 description: Account type
  *                 example: "checking"
- *               balance:
- *                 type: number
- *                 format: decimal
- *                 description: Initial account balance
- *                 example: 1500.00
+ *               note:
+ *                 type: string
+ *                 nullable: true
+ *                 description: Optional account notes
+ *                 example: "Primary checking account for daily expenses"
  *     responses:
  *       201:
  *         description: Account created successfully
@@ -113,7 +160,7 @@ router.post('/', createAccount);
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *         description: Account ID
  *     responses:
  *       200:
@@ -143,7 +190,7 @@ router.post('/', createAccount);
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *         description: Account ID
  *     requestBody:
  *       required: true
@@ -197,7 +244,7 @@ router.post('/', createAccount);
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *         description: Account ID
  *     responses:
  *       204:
