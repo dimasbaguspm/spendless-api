@@ -1,19 +1,20 @@
-import express, { Router } from 'express';
+import { Router } from 'express';
 
-import { TransactionController } from '../controllers/transaction.controller.ts';
-import { authenticateJWT } from '../middleware/auth.middleware.ts';
+import {
+  listTransactions,
+  createTransaction,
+  getTransaction,
+  updateTransaction,
+  deleteTransaction,
+} from '../controllers/index.ts';
 
-const router: Router = express.Router();
-const transactionController = new TransactionController();
+const router = Router();
 
-// All routes require authentication
-router.use(authenticateJWT);
-
-// Regular CRUD routes
-router.get('/', transactionController.getTransactions.bind(transactionController));
-router.post('/', transactionController.createTransaction.bind(transactionController));
-router.get('/:id', transactionController.getTransactionById.bind(transactionController));
-router.put('/:id', transactionController.updateTransaction.bind(transactionController));
-router.delete('/:id', transactionController.deleteTransaction.bind(transactionController));
+// Transaction routes
+router.get('/', listTransactions);
+router.post('/', createTransaction);
+router.get('/:id', getTransaction);
+router.patch('/:id', updateTransaction);
+router.delete('/:id', deleteTransaction);
 
 export default router;

@@ -5,7 +5,7 @@ const dbUrl = new URL(process.env.DATABASE_URL ?? 'postgres://postgres:postgres@
 
 export default {
   schema: './src/models/schema.ts',
-  out: './src/core/db/migrations',
+  out: './sql',
   dialect: 'postgresql',
   dbCredentials: {
     host: dbUrl.hostname,

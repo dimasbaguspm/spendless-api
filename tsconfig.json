@@ -31,6 +31,6 @@
     /* Completeness */
     "skipLibCheck": true                                 /* Skip type checking all .d.ts files */
   },
-  "include": ["src/**/*", "jest.config.js", "tsup.config.ts", "eslint.config.js", "commitlint.config.js", ".versionrc.js", "drizzle.config.ts"],  /* Only include files in the src directory */
+  "include": ["src/**/*", "vi.config.js", "tsup.config.ts", "eslint.config.js", "commitlint.config.js", ".versionrc.js", "drizzle.config.ts", "vitest.config.ts"],  /* Only include files in the src directory */
   "exclude": ["node_modules", "dist"]                    /* Exclude node_modules and build directory */
 }

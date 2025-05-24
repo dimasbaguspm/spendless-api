@@ -1,26 +1,36 @@
 import { Request, Response, NextFunction } from 'express';
 
-import { UnauthorizedException } from '../helpers/exceptions/index.ts';
 import { getErrorResponse } from '../helpers/http-response/index.ts';
-import { TokenService } from '../services/token.service.ts';
+import { AccessTokenService } from '../services/authentication/access-token.service.ts';
+
+const accessTokenService = new AccessTokenService();
 
 /**
- * Middleware to authenticate JWT tokens from the Authorization header
+ * Middleware to authenticate JWT tokens - only validates token existence and validity
  */
-export const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
+export function authenticateJWT(req: Request, res: Response, next: NextFunction) {
   try {
-    const tokenService = new TokenService();
-
-    // Extract token from request
-    const token = tokenService.extractTokenFromRequest(req);
-
-    // Verify token
-    const decoded = tokenService.verifyAccessToken(token);
-
-    if (!decoded?.sub) throw new UnauthorizedException('Invalid token');
+    // Extract and verify token - this will throw if token is missing or invalid
+    const token = accessTokenService.extractTokenFromRequest(req);
+    accessTokenService.verifyAccessToken(token);
 
     next();
   } catch (error) {
     getErrorResponse(res, error);
   }
-};
+}
+
+/**
+ * Middleware variant that allows optional authentication
+ */
+export function optionalAuth(req: Request, _res: Response, next: NextFunction) {
+  try {
+    const token = accessTokenService.extractTokenFromRequest(req);
+    accessTokenService.verifyAccessToken(token);
+    // Token is valid, continue
+    next();
+  } catch {
+    // Continue without authentication if token is missing or invalid
+    next();
+  }
+}
