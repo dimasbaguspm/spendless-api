@@ -12,17 +12,8 @@ import {
 const router = Router();
 
 /**
- * @s *   delete:
- *     summary: Delete category
- *     description: Delete a category
- *     tags: [Categories]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: Category IDcategories:
+ * @swagger
+ * /categories:
  *   get:
  *     summary: List all categories
  *     description: Retrieve all categories for the authenticated user's group with optional filtering, pagination, and sorting

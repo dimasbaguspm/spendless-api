@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 
 import { NotFoundException } from '../helpers/exceptions/index.ts';
 import { getErrorResponse } from '../helpers/http-response/index.ts';
-import { parseId } from '../helpers/parsers/index.ts';
+import { parseBody, parseId } from '../helpers/parsers/index.ts';
 import { AccessTokenService } from '../services/authentication/access-token.service.ts';
 import { GroupService } from '../services/database/group.service.ts';
 import { UserService } from '../services/database/user.service.ts';
@@ -13,7 +13,7 @@ const userService = new UserService();
 
 export async function createGroup(req: Request, res: Response) {
   try {
-    const group = await groupService.createSingle(req.body);
+    const group = await groupService.createSingle(parseBody(req.body));
 
     res.status(201).json(group);
   } catch (err) {
@@ -54,7 +54,7 @@ export async function updateGroup(req: Request, res: Response) {
       throw new NotFoundException('Group not found or access denied');
     }
 
-    const group = await groupService.updateSingle(id, req.body);
+    const group = await groupService.updateSingle(id, parseBody(req.body));
 
     if (!group) {
       throw new NotFoundException('Group not found');
