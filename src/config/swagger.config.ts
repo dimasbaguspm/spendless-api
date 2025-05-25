@@ -428,31 +428,570 @@ const options: swaggerJSDoc.Options = {
         PaginatedResponse: {
           type: 'object',
           properties: {
-            data: {
+            items: {
               type: 'array',
               items: {},
               description: 'Array of items',
             },
-            pagination: {
+            pageNumber: {
+              type: 'integer',
+              description: 'Current page number',
+            },
+            pageSize: {
+              type: 'integer',
+              description: 'Number of items per page',
+            },
+            totalItems: {
+              type: 'integer',
+              description: 'Total number of items',
+            },
+            totalPages: {
+              type: 'integer',
+              description: 'Total number of pages',
+            },
+          },
+        },
+        PagedGroups: {
+          allOf: [
+            { $ref: '#/components/schemas/PaginatedResponse' },
+            {
               type: 'object',
               properties: {
-                total: {
-                  type: 'integer',
-                  description: 'Total number of items',
-                },
-                page: {
-                  type: 'integer',
-                  description: 'Current page number',
-                },
-                limit: {
-                  type: 'integer',
-                  description: 'Items per page',
-                },
-                totalPages: {
-                  type: 'integer',
-                  description: 'Total number of pages',
+                items: {
+                  type: 'array',
+                  items: { $ref: '#/components/schemas/Group' },
                 },
               },
+            },
+          ],
+        },
+        PagedUsers: {
+          allOf: [
+            { $ref: '#/components/schemas/PaginatedResponse' },
+            {
+              type: 'object',
+              properties: {
+                items: {
+                  type: 'array',
+                  items: { $ref: '#/components/schemas/User' },
+                },
+              },
+            },
+          ],
+        },
+        PagedAccounts: {
+          allOf: [
+            { $ref: '#/components/schemas/PaginatedResponse' },
+            {
+              type: 'object',
+              properties: {
+                items: {
+                  type: 'array',
+                  items: { $ref: '#/components/schemas/Account' },
+                },
+              },
+            },
+          ],
+        },
+        PagedAccountLimits: {
+          allOf: [
+            { $ref: '#/components/schemas/PaginatedResponse' },
+            {
+              type: 'object',
+              properties: {
+                items: {
+                  type: 'array',
+                  items: { $ref: '#/components/schemas/AccountLimit' },
+                },
+              },
+            },
+          ],
+        },
+        PagedCategories: {
+          allOf: [
+            { $ref: '#/components/schemas/PaginatedResponse' },
+            {
+              type: 'object',
+              properties: {
+                items: {
+                  type: 'array',
+                  items: { $ref: '#/components/schemas/Category' },
+                },
+              },
+            },
+          ],
+        },
+        PagedRecurrences: {
+          allOf: [
+            { $ref: '#/components/schemas/PaginatedResponse' },
+            {
+              type: 'object',
+              properties: {
+                items: {
+                  type: 'array',
+                  items: { $ref: '#/components/schemas/Recurrence' },
+                },
+              },
+            },
+          ],
+        },
+        PagedTransactions: {
+          allOf: [
+            { $ref: '#/components/schemas/PaginatedResponse' },
+            {
+              type: 'object',
+              properties: {
+                items: {
+                  type: 'array',
+                  items: { $ref: '#/components/schemas/Transaction' },
+                },
+              },
+            },
+          ],
+        },
+        NewGroup: {
+          type: 'object',
+          required: ['name', 'defaultCurrency'],
+          properties: {
+            name: {
+              type: 'string',
+              maxLength: 255,
+              description: 'Group name',
+            },
+            defaultCurrency: {
+              type: 'string',
+              minLength: 3,
+              maxLength: 3,
+              description: 'Default currency code (3 characters)',
+              example: 'USD',
+            },
+          },
+        },
+        UpdateGroup: {
+          type: 'object',
+          properties: {
+            name: {
+              type: 'string',
+              maxLength: 255,
+              description: 'Group name',
+            },
+            defaultCurrency: {
+              type: 'string',
+              minLength: 3,
+              maxLength: 3,
+              description: 'Default currency code (3 characters)',
+              example: 'USD',
+            },
+          },
+        },
+        NewUser: {
+          type: 'object',
+          required: ['groupId', 'email', 'passwordHash', 'name', 'isActive'],
+          properties: {
+            groupId: {
+              type: 'integer',
+              description: 'Group identifier the user belongs to',
+            },
+            email: {
+              type: 'string',
+              format: 'email',
+              maxLength: 255,
+              description: 'User email address',
+            },
+            passwordHash: {
+              type: 'string',
+              maxLength: 255,
+              description: 'User password hash',
+            },
+            name: {
+              type: 'string',
+              maxLength: 255,
+              description: 'User full name',
+            },
+            isActive: {
+              type: 'boolean',
+              description: 'Whether the user is active',
+            },
+          },
+        },
+        UpdateUser: {
+          type: 'object',
+          properties: {
+            groupId: {
+              type: 'integer',
+              description: 'Group identifier the user belongs to',
+            },
+            email: {
+              type: 'string',
+              format: 'email',
+              maxLength: 255,
+              description: 'User email address',
+            },
+            passwordHash: {
+              type: 'string',
+              maxLength: 255,
+              description: 'User password hash',
+            },
+            name: {
+              type: 'string',
+              maxLength: 255,
+              description: 'User full name',
+            },
+            isActive: {
+              type: 'boolean',
+              description: 'Whether the user is active',
+            },
+          },
+        },
+        NewAccount: {
+          type: 'object',
+          required: ['groupId', 'name', 'type'],
+          properties: {
+            groupId: {
+              type: 'integer',
+              description: 'Group identifier the account belongs to',
+            },
+            name: {
+              type: 'string',
+              maxLength: 255,
+              description: 'Account name',
+            },
+            type: {
+              type: 'string',
+              maxLength: 50,
+              description: 'Account type (e.g., checking, savings, credit, cash)',
+              example: 'checking',
+            },
+            note: {
+              type: 'string',
+              nullable: true,
+              description: 'Optional account notes',
+            },
+          },
+        },
+        UpdateAccount: {
+          type: 'object',
+          properties: {
+            groupId: {
+              type: 'integer',
+              description: 'Group identifier the account belongs to',
+            },
+            name: {
+              type: 'string',
+              maxLength: 255,
+              description: 'Account name',
+            },
+            type: {
+              type: 'string',
+              maxLength: 50,
+              description: 'Account type (e.g., checking, savings, credit, cash)',
+              example: 'checking',
+            },
+            note: {
+              type: 'string',
+              nullable: true,
+              description: 'Optional account notes',
+            },
+          },
+        },
+        NewAccountLimit: {
+          type: 'object',
+          required: ['accountId', 'period', 'limit'],
+          properties: {
+            accountId: {
+              type: 'integer',
+              description: 'Account identifier',
+            },
+            period: {
+              type: 'string',
+              enum: ['month', 'week'],
+              description: 'Limit period',
+            },
+            limit: {
+              type: 'number',
+              multipleOf: 0.01,
+              minimum: 0,
+              description: 'Spending limit amount',
+            },
+          },
+        },
+        UpdateAccountLimit: {
+          type: 'object',
+          properties: {
+            accountId: {
+              type: 'integer',
+              description: 'Account identifier',
+            },
+            period: {
+              type: 'string',
+              enum: ['month', 'week'],
+              description: 'Limit period',
+            },
+            limit: {
+              type: 'number',
+              multipleOf: 0.01,
+              minimum: 0,
+              description: 'Spending limit amount',
+            },
+          },
+        },
+        NewCategory: {
+          type: 'object',
+          required: ['groupId', 'name'],
+          properties: {
+            groupId: {
+              type: 'integer',
+              description: 'Group identifier the category belongs to',
+            },
+            parentId: {
+              type: 'integer',
+              nullable: true,
+              description: 'Parent category ID for nested categories',
+            },
+            name: {
+              type: 'string',
+              maxLength: 100,
+              description: 'Category name',
+            },
+            note: {
+              type: 'string',
+              nullable: true,
+              description: 'Optional category notes',
+            },
+          },
+        },
+        UpdateCategory: {
+          type: 'object',
+          properties: {
+            groupId: {
+              type: 'integer',
+              description: 'Group identifier the category belongs to',
+            },
+            parentId: {
+              type: 'integer',
+              nullable: true,
+              description: 'Parent category ID for nested categories',
+            },
+            name: {
+              type: 'string',
+              maxLength: 100,
+              description: 'Category name',
+            },
+            note: {
+              type: 'string',
+              nullable: true,
+              description: 'Optional category notes',
+            },
+          },
+        },
+        NewRecurrence: {
+          type: 'object',
+          required: ['frequency', 'interval', 'nextOccurrenceDate'],
+          properties: {
+            frequency: {
+              type: 'string',
+              enum: ['daily', 'weekly', 'monthly', 'yearly'],
+              description: 'Recurrence frequency',
+            },
+            interval: {
+              type: 'integer',
+              minimum: 1,
+              description: 'Interval between recurrences',
+            },
+            nextOccurrenceDate: {
+              type: 'string',
+              format: 'date',
+              description: 'Next occurrence date',
+            },
+            endDate: {
+              type: 'string',
+              format: 'date',
+              nullable: true,
+              description: 'End date for recurrence',
+            },
+          },
+        },
+        UpdateRecurrence: {
+          type: 'object',
+          properties: {
+            frequency: {
+              type: 'string',
+              enum: ['daily', 'weekly', 'monthly', 'yearly'],
+              description: 'Recurrence frequency',
+            },
+            interval: {
+              type: 'integer',
+              minimum: 1,
+              description: 'Interval between recurrences',
+            },
+            nextOccurrenceDate: {
+              type: 'string',
+              format: 'date',
+              description: 'Next occurrence date',
+            },
+            endDate: {
+              type: 'string',
+              format: 'date',
+              nullable: true,
+              description: 'End date for recurrence',
+            },
+          },
+        },
+        NewTransaction: {
+          type: 'object',
+          required: ['groupId', 'accountId', 'categoryId', 'createdByUserId', 'amount', 'currency', 'date'],
+          properties: {
+            groupId: {
+              type: 'integer',
+              description: 'Group identifier',
+            },
+            accountId: {
+              type: 'integer',
+              description: 'Account identifier',
+            },
+            categoryId: {
+              type: 'integer',
+              description: 'Category identifier',
+            },
+            createdByUserId: {
+              type: 'integer',
+              description: 'User who created the transaction',
+            },
+            amount: {
+              type: 'number',
+              multipleOf: 0.01,
+              description: 'Transaction amount with 2 decimal precision',
+              example: 123.45,
+            },
+            currency: {
+              type: 'string',
+              minLength: 3,
+              maxLength: 3,
+              description: 'Currency code (3 characters)',
+              example: 'USD',
+            },
+            date: {
+              type: 'string',
+              format: 'date',
+              description: 'Transaction date',
+            },
+            note: {
+              type: 'string',
+              nullable: true,
+              description: 'Optional transaction notes',
+            },
+            recurrenceId: {
+              type: 'integer',
+              nullable: true,
+              description: 'Recurrence pattern ID if this is a recurring transaction',
+            },
+          },
+        },
+        UpdateTransaction: {
+          type: 'object',
+          properties: {
+            groupId: {
+              type: 'integer',
+              description: 'Group identifier',
+            },
+            accountId: {
+              type: 'integer',
+              description: 'Account identifier',
+            },
+            categoryId: {
+              type: 'integer',
+              description: 'Category identifier',
+            },
+            createdByUserId: {
+              type: 'integer',
+              description: 'User who created the transaction',
+            },
+            amount: {
+              type: 'number',
+              multipleOf: 0.01,
+              description: 'Transaction amount with 2 decimal precision',
+              example: 123.45,
+            },
+            currency: {
+              type: 'string',
+              minLength: 3,
+              maxLength: 3,
+              description: 'Currency code (3 characters)',
+              example: 'USD',
+            },
+            date: {
+              type: 'string',
+              format: 'date',
+              description: 'Transaction date',
+            },
+            note: {
+              type: 'string',
+              nullable: true,
+              description: 'Optional transaction notes',
+            },
+            recurrenceId: {
+              type: 'integer',
+              nullable: true,
+              description: 'Recurrence pattern ID if this is a recurring transaction',
+            },
+          },
+        },
+        NewRefreshToken: {
+          type: 'object',
+          required: ['userId', 'token', 'expires'],
+          properties: {
+            userId: {
+              type: 'integer',
+              description: 'User identifier',
+            },
+            token: {
+              type: 'string',
+              description: 'Refresh token value',
+            },
+            expires: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Token expiration timestamp',
+            },
+            revokedAt: {
+              type: 'string',
+              format: 'date-time',
+              nullable: true,
+              description: 'Token revocation timestamp',
+            },
+            replacedByToken: {
+              type: 'string',
+              nullable: true,
+              description: 'Token that replaced this one',
+            },
+          },
+        },
+        UpdateRefreshToken: {
+          type: 'object',
+          properties: {
+            userId: {
+              type: 'integer',
+              description: 'User identifier',
+            },
+            token: {
+              type: 'string',
+              description: 'Refresh token value',
+            },
+            expires: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Token expiration timestamp',
+            },
+            revokedAt: {
+              type: 'string',
+              format: 'date-time',
+              nullable: true,
+              description: 'Token revocation timestamp',
+            },
+            replacedByToken: {
+              type: 'string',
+              nullable: true,
+              description: 'Token that replaced this one',
             },
           },
         },
@@ -686,7 +1225,7 @@ const options: swaggerJSDoc.Options = {
                 },
                 sortBy: {
                   type: 'string',
-                  enum: ['period', 'limit', 'createdAt'],
+                  enum: ['period', 'limit', 'startDate', 'createdAt'],
                   description: 'Field to sort by',
                 },
               },
@@ -721,6 +1260,33 @@ const options: swaggerJSDoc.Options = {
                 sortBy: {
                   type: 'string',
                   enum: ['frequency', 'interval', 'nextOccurrenceDate', 'createdAt'],
+                  description: 'Field to sort by',
+                },
+              },
+            },
+          ],
+        },
+        RefreshTokenQueryParameters: {
+          allOf: [
+            { $ref: '#/components/schemas/QueryParameters' },
+            {
+              type: 'object',
+              properties: {
+                userId: {
+                  type: 'integer',
+                  description: 'Filter by user ID',
+                },
+                token: {
+                  type: 'string',
+                  description: 'Filter by token value',
+                },
+                isActive: {
+                  type: 'boolean',
+                  description: 'Filter by active status (not revoked)',
+                },
+                sortBy: {
+                  type: 'string',
+                  enum: ['userId', 'expires', 'createdAt'],
                   description: 'Field to sort by',
                 },
               },
