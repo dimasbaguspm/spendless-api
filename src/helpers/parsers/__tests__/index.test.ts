@@ -317,9 +317,10 @@ describe('parseQuery', () => {
 describe('parseBody', () => {
   it('should convert numeric string values to numbers in simple object', () => {
     const body = { age: '25', name: 'John', salary: '50000.50' };
-    parseBody(body);
+    const result = parseBody(body);
 
     expect(body).toEqual({ age: 25, name: 'John', salary: 50000.5 });
+    expect(result).toEqual({ age: 25, name: 'John', salary: 50000.5 });
     expect(body.age).toBe(25);
     expect(body.salary).toBe(50000.5);
   });
@@ -336,7 +337,7 @@ describe('parseBody', () => {
       },
       count: '10',
     };
-    parseBody(body);
+    const result = parseBody(body);
 
     expect(body).toEqual({
       user: {
@@ -349,6 +350,7 @@ describe('parseBody', () => {
       },
       count: 10,
     });
+    expect(result).toEqual(body);
   });
 
   it('should handle arrays with numeric strings', () => {
@@ -360,7 +362,7 @@ describe('parseBody', () => {
         { id: '2', value: '100.5' },
       ],
     };
-    parseBody(body);
+    const result = parseBody(body);
 
     expect(body).toEqual({
       numbers: [1, 2, 3.5],
@@ -370,6 +372,7 @@ describe('parseBody', () => {
         { id: 2, value: 100.5 },
       ],
     });
+    expect(result).toEqual(body);
   });
 
   it('should handle deeply nested structures', () => {
@@ -526,23 +529,24 @@ describe('parseBody', () => {
     });
   });
 
-  it('should return undefined for null input', () => {
-    const result = parseBody(null);
-    expect(result).toBeUndefined();
+  it('should throw error for null input', () => {
+    expect(() => parseBody(null)).toThrow(BadRequestException);
+    expect(() => parseBody(null)).toThrow('Invalid input: expected an object or array');
   });
 
-  it('should return undefined for non-object input', () => {
-    expect(parseBody('string')).toBeUndefined();
-    expect(parseBody(123)).toBeUndefined();
-    expect(parseBody(true)).toBeUndefined();
-    expect(parseBody(undefined)).toBeUndefined();
+  it('should throw error for non-object input', () => {
+    expect(() => parseBody('string')).toThrow(BadRequestException);
+    expect(() => parseBody(123)).toThrow(BadRequestException);
+    expect(() => parseBody(true)).toThrow(BadRequestException);
+    expect(() => parseBody(undefined)).toThrow(BadRequestException);
   });
 
   it('should handle arrays at root level', () => {
     const body = ['1', '2', { id: '3', name: 'test' }, 'text'];
-    parseBody(body);
+    const result = parseBody(body);
 
     expect(body).toEqual([1, 2, { id: 3, name: 'test' }, 'text']);
+    expect(result).toEqual([1, 2, { id: 3, name: 'test' }, 'text']);
   });
 
   it('should handle complex mixed data structures', () => {
@@ -569,7 +573,7 @@ describe('parseBody', () => {
       },
     };
 
-    parseBody(body);
+    const result = parseBody(body);
 
     expect(body).toEqual({
       users: [
@@ -593,6 +597,7 @@ describe('parseBody', () => {
         },
       },
     });
+    expect(result).toEqual(body);
   });
 
   it('should handle zero values correctly', () => {
