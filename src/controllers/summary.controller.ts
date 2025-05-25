@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 
 import { getErrorResponse } from '../helpers/http-response/index.ts';
+import { parseQuery } from '../helpers/parsers/index.ts';
 import { AccessTokenService } from '../services/authentication/access-token.service.ts';
 import { AccountService } from '../services/database/account.service.ts';
 import { CategoryService } from '../services/database/category.service.ts';
@@ -16,7 +17,8 @@ export async function getSummary(req: Request, res: Response) {
     const user = accessTokenService.getUserFromRequest(req);
 
     // Get query parameters for date range
-    const { startDate, endDate } = req.query ?? {};
+    const parsedQuery = parseQuery(req.query);
+    const { startDate, endDate } = parsedQuery ?? {};
 
     // Get all transactions for the user's group within date range
     const transactionFilters: { groupId: number; startDate?: string; endDate?: string } = { groupId: user.groupId };

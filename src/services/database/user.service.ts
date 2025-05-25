@@ -57,13 +57,13 @@ export class UserService implements DatabaseServiceSchema<User> {
       .orderBy(order)
       .limit(pageSize)
       .offset((pageNumber - 1) * pageSize)
-      .prepare('pagedQuery');
+      .prepare('USER_PAGED_QUERY');
 
     const totalQuery = db
       .select()
       .from(users)
       .where(conditions.length ? and(...conditions) : undefined)
-      .prepare('totalQuery');
+      .prepare('USER_TOTAL_QUERY');
 
     const [pagedData, totalData] = await Promise.all([pagedQuery.execute(), totalQuery.execute()]);
 

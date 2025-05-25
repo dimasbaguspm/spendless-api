@@ -15,55 +15,98 @@ const router = Router();
  * /transactions:
  *   get:
  *     summary: List all transactions
- *     description: Retrieve all transactions for the authenticated user's group with optional filtering
+ *     description: Retrieve all transactions for the authenticated user's group with optional filtering, pagination, and sorting
  *     tags: [Transactions]
  *     parameters:
  *       - in: query
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         description: Filter by transaction ID
+ *       - in: query
+ *         name: groupId
+ *         schema:
+ *           type: integer
+ *         description: Filter by group ID
+ *       - in: query
  *         name: accountId
  *         schema:
- *           type: string
+ *           type: integer
  *         description: Filter by account ID
  *       - in: query
  *         name: categoryId
  *         schema:
- *           type: string
+ *           type: integer
  *         description: Filter by category ID
+ *       - in: query
+ *         name: createdByUserId
+ *         schema:
+ *           type: integer
+ *         description: Filter by user who created the transaction
+ *       - in: query
+ *         name: note
+ *         schema:
+ *           type: string
+ *         description: Search in transaction notes
  *       - in: query
  *         name: startDate
  *         schema:
  *           type: string
  *           format: date
- *         description: Filter transactions from this date
+ *         description: Filter transactions from this date (YYYY-MM-DD)
  *       - in: query
  *         name: endDate
  *         schema:
  *           type: string
  *           format: date
- *         description: Filter transactions until this date
+ *         description: Filter transactions until this date (YYYY-MM-DD)
  *       - in: query
- *         name: limit
+ *         name: currency
+ *         schema:
+ *           type: string
+ *           minLength: 3
+ *           maxLength: 3
+ *         description: Filter by currency code
+ *       - in: query
+ *         name: recurrenceId
+ *         schema:
+ *           type: integer
+ *         description: Filter by recurrence ID
+ *       - in: query
+ *         name: pageNumber
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: pageSize
  *         schema:
  *           type: integer
  *           minimum: 1
  *           maximum: 100
- *           default: 50
- *         description: Number of transactions to return
+ *           default: 25
+ *         description: Number of items per page
  *       - in: query
- *         name: offset
+ *         name: sortBy
  *         schema:
- *           type: integer
- *           minimum: 0
- *           default: 0
- *         description: Number of transactions to skip
+ *           type: string
+ *           enum: [date, amount, createdAt]
+ *         description: Field to sort by
+ *       - in: query
+ *         name: sortOrder
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: asc
+ *         description: Sort order
  *     responses:
  *       200:
- *         description: List of transactions
+ *         description: Paginated list of transactions
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Transaction'
+ *               $ref: '#/components/schemas/PaginatedResponse'
  *       401:
  *         description: Unauthorized
  *         content:
@@ -87,32 +130,47 @@ const router = Router();
  *           schema:
  *             type: object
  *             required:
- *               - description
+ *               - note
  *               - amount
  *               - date
  *               - accountId
  *               - categoryId
  *             properties:
- *               description:
+ *               note:
  *                 type: string
- *                 description: Transaction description
+ *                 maxLength: 500
+ *                 description: Transaction note or description
  *                 example: "Grocery shopping at Walmart"
  *               amount:
  *                 type: number
- *                 format: decimal
- *                 description: Transaction amount (positive for income, negative for expense)
- *                 example: -85.50
+ *                 multipleOf: 0.01
+ *                 description: Transaction amount (in cents or smallest currency unit)
+ *                 example: 8550
  *               date:
  *                 type: string
  *                 format: date
- *                 description: Transaction date
- *                 example: "2025-05-25"
+ *                 description: Transaction date (YYYY-MM-DD)
+ *                 example: "2025-01-25"
  *               accountId:
- *                 type: string
+ *                 type: integer
  *                 description: Account ID for this transaction
+ *                 example: 1
  *               categoryId:
- *                 type: string
+ *                 type: integer
  *                 description: Category ID for this transaction
+ *                 example: 2
+ *               currency:
+ *                 type: string
+ *                 minLength: 3
+ *                 maxLength: 3
+ *                 nullable: true
+ *                 description: Currency code (3 letters)
+ *                 example: "USD"
+ *               recurrenceId:
+ *                 type: integer
+ *                 nullable: true
+ *                 description: Recurrence ID if this is a recurring transaction
+ *                 example: null
  *     responses:
  *       201:
  *         description: Transaction created successfully
@@ -155,7 +213,7 @@ router.post('/', createTransaction);
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *         description: Transaction ID
  *     responses:
  *       200:
@@ -185,7 +243,7 @@ router.post('/', createTransaction);
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *         description: Transaction ID
  *     requestBody:
  *       required: true
@@ -245,7 +303,7 @@ router.post('/', createTransaction);
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *         description: Transaction ID
  *     responses:
  *       204:

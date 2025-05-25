@@ -56,18 +56,29 @@ router.get('/me', getMe);
  *             properties:
  *               name:
  *                 type: string
+ *                 maxLength: 255
  *                 description: User's full name
  *                 example: "John Doe"
  *               email:
  *                 type: string
  *                 format: email
+ *                 maxLength: 255
  *                 description: User's email address
  *                 example: "john.doe@example.com"
  *               password:
  *                 type: string
- *                 format: password
+ *                 minLength: 8
  *                 description: New password (optional)
  *                 example: "newSecurePassword123"
+ *               groupId:
+ *                 type: integer
+ *                 nullable: true
+ *                 description: Group ID (optional)
+ *                 example: 1
+ *               isActive:
+ *                 type: boolean
+ *                 description: User active status
+ *                 example: true
  *     responses:
  *       200:
  *         description: User profile updated successfully

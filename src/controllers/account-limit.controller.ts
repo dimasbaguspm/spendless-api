@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 
 import { NotFoundException } from '../helpers/exceptions/index.ts';
 import { getErrorResponse } from '../helpers/http-response/index.ts';
-import { parseId } from '../helpers/parsers/index.ts';
+import { parseBody, parseId, parseQuery } from '../helpers/parsers/index.ts';
 import { AccessTokenService } from '../services/authentication/access-token.service.ts';
 import { AccountLimitService } from '../services/database/account-limit.service.ts';
 import { AccountService } from '../services/database/account.service.ts';
@@ -25,7 +25,7 @@ export async function listAccountLimits(req: Request, res: Response) {
       throw new NotFoundException('Account not found');
     }
 
-    const filters = { ...req.query, accountId };
+    const filters = { ...parseQuery(req.query), accountId };
     const limits = await accountLimitService.getMany(filters);
 
     res.status(200).json(limits);
@@ -47,7 +47,7 @@ export async function createAccountLimit(req: Request, res: Response) {
       throw new NotFoundException('Account not found');
     }
 
-    const payload = { ...req.body, accountId };
+    const payload = { ...parseBody(req.body), accountId };
 
     const limit = await accountLimitService.createSingle(payload);
 
@@ -102,7 +102,7 @@ export async function updateAccountLimit(req: Request, res: Response) {
       throw new NotFoundException('Account limit not found');
     }
 
-    const limit = await accountLimitService.updateSingle(limitId, req.body);
+    const limit = await accountLimitService.updateSingle(limitId, parseBody(req.body));
 
     res.status(200).json(limit);
   } catch (err) {

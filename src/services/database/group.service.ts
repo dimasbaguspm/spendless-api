@@ -39,13 +39,13 @@ export class GroupService implements DatabaseServiceSchema<Group> {
       .orderBy(order)
       .limit(pageSize)
       .offset((pageNumber - 1) * pageSize)
-      .prepare('pagedQuery');
+      .prepare('GROUP_PAGED_QUERY');
 
     const totalQuery = db
       .select()
       .from(groups)
       .where(conditions.length ? and(...conditions) : undefined)
-      .prepare('totalQuery');
+      .prepare('GROUP_TOTAL_QUERY');
 
     const [pagedData, totalData] = await Promise.all([pagedQuery.execute(), totalQuery.execute()]);
 

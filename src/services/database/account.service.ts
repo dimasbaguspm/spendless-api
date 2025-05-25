@@ -45,13 +45,13 @@ export class AccountService implements DatabaseServiceSchema<Account> {
       .orderBy(order)
       .limit(pageSize)
       .offset((pageNumber - 1) * pageSize)
-      .prepare('pagedQuery');
+      .prepare('ACCOUNT_PAGED_QUERY');
 
     const totalQuery = db
       .select()
       .from(accounts)
       .where(conditions.length ? and(...conditions) : undefined)
-      .prepare('totalQuery');
+      .prepare('ACCOUNT_TOTAL_QUERY');
 
     const [pagedData, totalData] = await Promise.all([pagedQuery.execute(), totalQuery.execute()]);
 

@@ -58,13 +58,13 @@ export class RecurrenceService implements DatabaseServiceSchema<Recurrence> {
       .orderBy(order)
       .limit(pageSize)
       .offset((pageNumber - 1) * pageSize)
-      .prepare('pagedQuery');
+      .prepare('RECURRENCE_PAGED_QUERY');
 
     const totalQuery = db
       .select()
       .from(recurrences)
       .where(conditions.length ? and(...conditions) : undefined)
-      .prepare('totalQuery');
+      .prepare('RECURRENCE_TOTAL_QUERY');
 
     const [pagedData, totalData] = await Promise.all([pagedQuery.execute(), totalQuery.execute()]);
 

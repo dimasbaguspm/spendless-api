@@ -16,24 +16,64 @@ const router = Router();
  * /categories:
  *   get:
  *     summary: List all categories
- *     description: Retrieve all categories for the authenticated user's group
+ *     description: Retrieve all categories for the authenticated user's group with optional filtering, pagination, and sorting
  *     tags: [Categories]
  *     parameters:
  *       - in: query
- *         name: type
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         description: Filter by category ID
+ *       - in: query
+ *         name: groupId
+ *         schema:
+ *           type: integer
+ *         description: Filter by group ID
+ *       - in: query
+ *         name: name
  *         schema:
  *           type: string
- *           enum: [income, expense]
- *         description: Filter by category type
+ *         description: Filter by category name
+ *       - in: query
+ *         name: parentId
+ *         schema:
+ *           type: integer
+ *         description: Filter by parent category ID
+ *       - in: query
+ *         name: pageNumber
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: pageSize
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 25
+ *         description: Number of items per page
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum: [name, createdAt]
+ *         description: Field to sort by
+ *       - in: query
+ *         name: sortOrder
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: asc
+ *         description: Sort order
  *     responses:
  *       200:
- *         description: List of categories
+ *         description: Paginated list of categories
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Category'
+ *               $ref: '#/components/schemas/PaginatedResponse'
  *       401:
  *         description: Unauthorized
  *         content:
@@ -58,17 +98,22 @@ const router = Router();
  *             type: object
  *             required:
  *               - name
- *               - type
  *             properties:
  *               name:
  *                 type: string
+ *                 maxLength: 255
  *                 description: Category name
  *                 example: "Groceries"
- *               type:
+ *               parentId:
+ *                 type: integer
+ *                 nullable: true
+ *                 description: Parent category ID for subcategories
+ *                 example: null
+ *               note:
  *                 type: string
- *                 enum: [income, expense]
- *                 description: Category type
- *                 example: "expense"
+ *                 nullable: true
+ *                 description: Optional category notes
+ *                 example: "Food and beverage expenses"
  *     responses:
  *       201:
  *         description: Category created successfully
@@ -111,7 +156,7 @@ router.post('/', createCategory);
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *         description: Category ID
  *     responses:
  *       200:
@@ -141,7 +186,7 @@ router.post('/', createCategory);
  *         name: id
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *         description: Category ID
  *     requestBody:
  *       required: true
@@ -225,7 +270,7 @@ router.delete('/:id', deleteCategory);
  *         name: categoryId
  *         required: true
  *         schema:
- *           type: string
+ *           type: integer
  *         description: Category ID
  *       - in: query
  *         name: limit

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 
 import { BadRequestException, NotFoundException } from '../helpers/exceptions/index.ts';
 import { getErrorResponse } from '../helpers/http-response/index.ts';
-import { parseId } from '../helpers/parsers/index.ts';
+import { parseBody, parseId, parseQuery } from '../helpers/parsers/index.ts';
 import { AccessTokenService } from '../services/authentication/access-token.service.ts';
 import { AccountService } from '../services/database/account.service.ts';
 import { CategoryService } from '../services/database/category.service.ts';
@@ -18,7 +18,7 @@ export async function listTransactions(req: Request, res: Response) {
     const user = accessTokenService.getUserFromRequest(req);
 
     // Add user's groupId to query filters
-    const filters = { ...req.query, groupId: user.groupId };
+    const filters = { ...parseQuery(req.query), groupId: user.groupId };
     const transactions = await transactionService.getMany(filters);
 
     res.status(200).json(transactions);
@@ -32,21 +32,25 @@ export async function createTransaction(req: Request, res: Response) {
     const user = accessTokenService.getUserFromRequest(req);
 
     // Ensure the transaction is created for the user's group
-    const payload = {
-      ...req.body,
+    const parsedBody = parseBody(req.body) as Record<string, unknown>;
+    const payload: Record<string, unknown> = {
+      ...parsedBody,
       groupId: user.groupId,
       createdByUserId: user.id,
     };
 
     // Verify account belongs to user's group
-    const account = await accountService.getSingle({ id: payload.accountId, groupId: payload.groupId });
+    const account = await accountService.getSingle({
+      id: payload.accountId as number,
+      groupId: payload.groupId as number,
+    });
     if (!account) {
       throw new BadRequestException('Invalid account ID');
     }
 
     // Verify category belongs to user's group (if provided)
     if (payload?.categoryId) {
-      const category = await categoryService.getSingle({ id: payload.categoryId, groupId: user.groupId });
+      const category = await categoryService.getSingle({ id: payload.categoryId as number, groupId: user.groupId });
       if (!category) {
         throw new BadRequestException('Invalid category ID');
       }
@@ -89,11 +93,14 @@ export async function updateTransaction(req: Request, res: Response) {
       throw new NotFoundException('Transaction not found');
     }
 
-    const payload = { ...req.body };
+    const payload = parseBody(req.body) as Record<string, unknown>;
 
     // Verify account belongs to user's group (if being updated)
     if (payload?.accountId) {
-      const account = await accountService.getSingle({ id: payload.accountId, groupId: user.groupId });
+      const account = await accountService.getSingle({
+        id: payload.accountId as number,
+        groupId: user.groupId,
+      });
       if (!account) {
         throw new BadRequestException('Invalid account ID');
       }
@@ -101,7 +108,10 @@ export async function updateTransaction(req: Request, res: Response) {
 
     // Verify category belongs to user's group (if being updated)
     if (payload?.categoryId) {
-      const category = await categoryService.getSingle({ id: payload.categoryId, groupId: user.groupId });
+      const category = await categoryService.getSingle({
+        id: payload.categoryId as number,
+        groupId: user.groupId,
+      });
       if (!category) {
         throw new BadRequestException('Invalid category ID');
       }

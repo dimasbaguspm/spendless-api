@@ -51,13 +51,13 @@ export class AccountLimitService implements DatabaseServiceSchema<AccountLimit> 
       .orderBy(order)
       .limit(pageSize)
       .offset((pageNumber - 1) * pageSize)
-      .prepare('pagedQuery');
+      .prepare('ACC_LIMIT_PAGED_QUERY');
 
     const totalQuery = db
       .select()
       .from(accountLimits)
       .where(conditions.length ? and(...conditions) : undefined)
-      .prepare('totalQuery');
+      .prepare('ACC_LIMIT_TOTAL_QUERY');
 
     const [pagedData, totalData] = await Promise.all([pagedQuery.execute(), totalQuery.execute()]);
 

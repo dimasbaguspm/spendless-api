@@ -44,13 +44,13 @@ export class CategoryService implements DatabaseServiceSchema<Category> {
       .orderBy(order)
       .limit(pageSize)
       .offset((pageNumber - 1) * pageSize)
-      .prepare('pagedQuery');
+      .prepare('CATEGORY_PAGED_QUERY');
 
     const totalQuery = db
       .select()
       .from(categories)
       .where(conditions.length ? and(...conditions) : undefined)
-      .prepare('totalQuery');
+      .prepare('CATEGORY_TOTAL_QUERY');
 
     const [pagedData, totalData] = await Promise.all([pagedQuery.execute(), totalQuery.execute()]);
 

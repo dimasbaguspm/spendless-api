@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 
 import { NotFoundException } from '../helpers/exceptions/index.ts';
 import { getErrorResponse } from '../helpers/http-response/index.ts';
-import { parseId } from '../helpers/parsers/index.ts';
+import { parseBody, parseId, parseQuery } from '../helpers/parsers/index.ts';
 import { AccessTokenService } from '../services/authentication/access-token.service.ts';
 import { CategoryService } from '../services/database/category.service.ts';
 
@@ -14,7 +14,7 @@ export async function listCategories(req: Request, res: Response) {
     const user = accessTokenService.getUserFromRequest(req);
 
     // Add user's groupId to query filters
-    const filters = { ...req.query, groupId: user.groupId };
+    const filters = { ...parseQuery(req.query), groupId: user.groupId };
     const categories = await categoryService.getMany(filters);
 
     res.status(200).json(categories);
@@ -28,7 +28,7 @@ export async function createCategory(req: Request, res: Response) {
     const user = accessTokenService.getUserFromRequest(req);
 
     // Ensure the category is created for the user's group
-    const payload = { ...req.body, groupId: user.groupId };
+    const payload = { ...parseBody(req.body), groupId: user.groupId };
 
     const category = await categoryService.createSingle(payload);
 
@@ -67,7 +67,7 @@ export async function updateCategory(req: Request, res: Response) {
       throw new NotFoundException('Category not found');
     }
 
-    const category = await categoryService.updateSingle(id, req.body);
+    const category = await categoryService.updateSingle(id, parseBody(req.body));
 
     res.status(200).json(category);
   } catch (err) {

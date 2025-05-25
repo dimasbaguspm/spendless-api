@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 
 import { UnauthorizedException, ConflictException, BadRequestException } from '../helpers/exceptions/index.ts';
 import { getErrorResponse } from '../helpers/http-response/index.ts';
+import { parseBody } from '../helpers/parsers/index.ts';
 import { AccessTokenService } from '../services/authentication/access-token.service.ts';
 import { PasswordService } from '../services/authentication/password.service.ts';
 import { RefreshTokenService } from '../services/authentication/refresh-token.service.ts';
@@ -16,7 +17,8 @@ const groupService = new GroupService();
 
 export async function registerUser(req: Request, res: Response) {
   try {
-    const { group, user } = req.body ?? {};
+    const parsedBody = parseBody(req.body) as Record<string, unknown>;
+    const { group, user } = parsedBody ?? {};
 
     if (!group || typeof group !== 'object') {
       throw new BadRequestException('Group information is required to register a user');
@@ -27,7 +29,8 @@ export async function registerUser(req: Request, res: Response) {
     }
 
     // Check if email is already used
-    const existing = await userService.getSingle({ email: user.email });
+    const userObj = user as Record<string, unknown>;
+    const existing = await userService.getSingle({ email: userObj.email as string });
     if (existing) {
       throw new ConflictException('User with this email already exists');
     }
@@ -36,8 +39,8 @@ export async function registerUser(req: Request, res: Response) {
     const createdGroup = await groupService.createSingle(group);
 
     // Create user with the real groupId
-    const passwordHash = await passwordService.hashPassword(user.password);
-    const createdUser = await userService.createSingle({ ...user, passwordHash, groupId: createdGroup.id });
+    const passwordHash = await passwordService.hashPassword(userObj.password as string);
+    const createdUser = await userService.createSingle({ ...userObj, passwordHash, groupId: createdGroup.id });
 
     const token = accessTokenService.generateAccessToken(createdUser);
     const refreshToken = await refreshTokenService.generateRefreshToken(Number(createdUser.id));
@@ -52,12 +55,13 @@ export async function registerUser(req: Request, res: Response) {
 
 export async function loginUser(req: Request, res: Response) {
   try {
-    const user = await userService.getSingle({ email: req.body.email });
+    const parsedBody = parseBody(req.body) as Record<string, unknown>;
+    const user = await userService.getSingle({ email: parsedBody.email as string });
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    const valid = await passwordService.comparePassword(req.body.password, user.passwordHash);
+    const valid = await passwordService.comparePassword(parsedBody.password as string, user.passwordHash);
     if (!valid) {
       throw new UnauthorizedException('Invalid email or password');
     }
