@@ -77,10 +77,12 @@ export function parseQuery(query: Record<string, unknown>): Record<string, unkno
 /**
  * Recursively converts numeric strings to numbers in an object
  * @param obj - The object to process
+ * @returns The processed object with numeric strings converted to numbers
+ * @throws BadRequestException if the input is not a valid object
  */
-export function parseBody(obj: unknown): object | void {
+export function parseBody(obj: unknown): object {
   if (obj === null || typeof obj !== 'object') {
-    return;
+    throw new BadRequestException('Invalid input: expected an object or array');
   }
 
   // Handle arrays
@@ -90,10 +92,10 @@ export function parseBody(obj: unknown): object | void {
       if (typeof item === 'string' && isNumericString(item)) {
         obj[i] = parseFloat(item);
       } else if (typeof item === 'object' && item !== null) {
-        parseBody(item); // Don't assign the return value, modify in place
+        parseBody(item); // Recursively process nested objects/arrays
       }
     }
-    return;
+    return obj;
   }
 
   // Handle objects
@@ -106,11 +108,13 @@ export function parseBody(obj: unknown): object | void {
         // Convert to number if it's a valid numeric string
         objectRecord[key] = parseFloat(value);
       } else if (typeof value === 'object' && value !== null) {
-        // Recursively process nested objects - don't assign return value, modify in place
+        // Recursively process nested objects
         parseBody(value);
       }
     }
   }
+
+  return objectRecord;
 }
 
 /**

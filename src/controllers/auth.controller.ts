@@ -40,7 +40,12 @@ export async function registerUser(req: Request, res: Response) {
 
     // Create user with the real groupId
     const passwordHash = await passwordService.hashPassword(userObj.password as string);
-    const createdUser = await userService.createSingle({ ...userObj, passwordHash, groupId: createdGroup.id });
+
+    const createdUser = await userService.createSingle({
+      ...userObj,
+      password: passwordHash,
+      groupId: createdGroup.id,
+    });
 
     const token = accessTokenService.generateAccessToken(createdUser);
     const refreshToken = await refreshTokenService.generateRefreshToken(Number(createdUser.id));
