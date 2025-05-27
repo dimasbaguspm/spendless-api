@@ -1,11 +1,16 @@
+import cors from 'cors';
 import express from 'express';
 
+import { corsOptions, devCorsOptions } from './config/cors.config.ts';
 import { pool } from './core/db/config.ts';
 import { notFoundHandler } from './middleware/not-found.middleware.ts';
 import apiRoutes from './routes/api.routes.ts';
 
 const app = express();
 const PORT = process.env.PORT ?? 3000;
+
+// CORS middleware - use permissive settings in development
+app.use(cors(process.env.NODE_ENV === 'development' ? devCorsOptions : corsOptions));
 
 app.use(express.json());
 
