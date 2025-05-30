@@ -17,51 +17,7 @@ const router = Router();
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - user
- *               - group
- *             properties:
- *               user:
- *                 type: object
- *                 required:
- *                   - name
- *                   - email
- *                   - password
- *                 properties:
- *                   name:
- *                     type: string
- *                     maxLength: 255
- *                     description: User's full name
- *                     example: "John Doe"
- *                   email:
- *                     type: string
- *                     format: email
- *                     maxLength: 255
- *                     description: User's email address
- *                     example: "john.doe@example.com"
- *                   password:
- *                     type: string
- *                     minLength: 8
- *                     description: User's password (minimum 8 characters)
- *                     example: "securePassword123"
- *               group:
- *                 type: object
- *                 required:
- *                   - name
- *                 properties:
- *                   name:
- *                     type: string
- *                     maxLength: 255
- *                     description: Group name
- *                     example: "Doe Family Budget"
- *                   defaultCurrency:
- *                     type: string
- *                     minLength: 3
- *                     maxLength: 3
- *                     nullable: true
- *                     description: Default currency for the group (3-letter code)
- *                     example: "USD"
+ *             $ref: '#/components/schemas/RegistrationRequest'
  *     responses:
  *       201:
  *         description: User registered successfully
@@ -111,21 +67,7 @@ router.post('/register', registerUser);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - email
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *                 description: User's email address
- *                 example: "john.doe@example.com"
- *               password:
- *                 type: string
- *                 format: password
- *                 description: User's password
- *                 example: "securePassword123"
+ *             $ref: '#/components/schemas/LoginRequest'
  *     responses:
  *       200:
  *         description: Login successful

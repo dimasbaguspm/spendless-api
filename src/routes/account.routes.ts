@@ -76,7 +76,7 @@ const router = Router();
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/PaginatedResponse'
+ *               $ref: '#/components/schemas/PagedAccounts'
  *       401:
  *         description: Unauthorized
  *         content:
@@ -98,26 +98,7 @@ const router = Router();
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - name
- *               - type
- *             properties:
- *               name:
- *                 type: string
- *                 maxLength: 255
- *                 description: Account name
- *                 example: "Main Checking Account"
- *               type:
- *                 type: string
- *                 maxLength: 50
- *                 description: Account type
- *                 example: "checking"
- *               note:
- *                 type: string
- *                 nullable: true
- *                 description: Optional account notes
- *                 example: "Primary checking account for daily expenses"
+ *             $ref: '#/components/schemas/NewAccount'
  *     responses:
  *       201:
  *         description: Account created successfully
@@ -197,19 +178,7 @@ router.post('/', createAccount);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 description: Account name
- *               type:
- *                 type: string
- *                 enum: [savings, checking, credit, cash]
- *                 description: Account type
- *               balance:
- *                 type: number
- *                 format: decimal
- *                 description: Account balance
+ *             $ref: '#/components/schemas/UpdateAccount'
  *     responses:
  *       200:
  *         description: Account updated successfully

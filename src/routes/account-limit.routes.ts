@@ -76,7 +76,7 @@ const router = Router({ mergeParams: true }); // mergeParams allows access to pa
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/PaginatedResponse'
+ *               $ref: '#/components/schemas/PagedAccountLimits'
  *       401:
  *         description: Unauthorized - invalid or missing token
  *         content:
@@ -125,21 +125,7 @@ router.get('/', listAccountLimits);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - period
- *               - limit
- *             properties:
- *               period:
- *                 type: string
- *                 enum: [daily, weekly, monthly, yearly]
- *                 description: Limit period
- *                 example: "monthly"
- *               limit:
- *                 type: number
- *                 multipleOf: 0.01
- *                 description: Limit amount (in cents or smallest currency unit)
- *                 example: 50000
+ *             $ref: '#/components/schemas/NewAccountLimit'
  *     responses:
  *       201:
  *         description: Account limit created successfully
@@ -152,21 +138,7 @@ router.get('/', listAccountLimits);
  *                   type: string
  *                   example: "Account limit created successfully"
  *                 limit:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                     name:
- *                       type: string
- *                     amount:
- *                       type: number
- *                       format: decimal
- *                     period:
- *                       type: string
- *                     accountId:
- *                       type: string
- *                     groupId:
- *                       type: string
+ *                   $ref: '#/components/schemas/AccountLimit'
  *       400:
  *         description: Bad request - validation errors
  *         content:
@@ -306,22 +278,7 @@ router.get('/:limitId', getAccountLimit);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 description: Limit name
- *                 example: "Updated Monthly Food Budget"
- *               amount:
- *                 type: number
- *                 format: decimal
- *                 description: Limit amount
- *                 example: 600.00
- *               period:
- *                 type: string
- *                 enum: [daily, weekly, monthly, yearly]
- *                 description: Limit period
- *                 example: "monthly"
+ *             $ref: '#/components/schemas/UpdateAccountLimit'
  *     responses:
  *       200:
  *         description: Account limit updated successfully
@@ -334,21 +291,7 @@ router.get('/:limitId', getAccountLimit);
  *                   type: string
  *                   example: "Account limit updated successfully"
  *                 limit:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                     name:
- *                       type: string
- *                     amount:
- *                       type: number
- *                       format: decimal
- *                     period:
- *                       type: string
- *                     accountId:
- *                       type: string
- *                     groupId:
- *                       type: string
+ *                   $ref: '#/components/schemas/AccountLimit'
  *       400:
  *         description: Bad request - validation errors
  *         content:

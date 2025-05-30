@@ -18,16 +18,16 @@ const router = Router();
  *         name: startDate
  *         schema:
  *           type: string
- *           format: date
- *         description: Start date for summary period (YYYY-MM-DD)
- *         example: "2024-01-01"
+ *           format: date-time
+ *         description: Start date for summary period with timezone support (ISO 8601)
+ *         example: "2024-01-01T00:00:00Z"
  *       - in: query
  *         name: endDate
  *         schema:
  *           type: string
- *           format: date
- *         description: End date for summary period (YYYY-MM-DD)
- *         example: "2024-12-31"
+ *           format: date-time
+ *         description: End date for summary period with timezone support (ISO 8601)
+ *         example: "2024-12-31T23:59:59Z"
  *       - in: query
  *         name: accountId
  *         schema:
@@ -96,10 +96,10 @@ const router = Router();
  *                   properties:
  *                     startDate:
  *                       type: string
- *                       format: date
+ *                       format: date-time
  *                     endDate:
  *                       type: string
- *                       format: date
+ *                       format: date-time
  *       400:
  *         description: Bad request - invalid date format or parameters
  *         content:

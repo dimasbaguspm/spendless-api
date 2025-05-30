@@ -73,7 +73,7 @@ const router = Router();
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/PaginatedResponse'
+ *               $ref: '#/components/schemas/PagedCategories'
  *       401:
  *         description: Unauthorized
  *         content:
@@ -95,25 +95,7 @@ const router = Router();
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - name
- *             properties:
- *               name:
- *                 type: string
- *                 maxLength: 255
- *                 description: Category name
- *                 example: "Groceries"
- *               parentId:
- *                 type: integer
- *                 nullable: true
- *                 description: Parent category ID for subcategories
- *                 example: null
- *               note:
- *                 type: string
- *                 nullable: true
- *                 description: Optional category notes
- *                 example: "Food and beverage expenses"
+ *             $ref: '#/components/schemas/NewCategory'
  *     responses:
  *       201:
  *         description: Category created successfully
@@ -193,15 +175,7 @@ router.post('/', createCategory);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 description: Category name
- *               type:
- *                 type: string
- *                 enum: [income, expense]
- *                 description: Category type
+ *             $ref: '#/components/schemas/UpdateCategory'
  *     responses:
  *       200:
  *         description: Category updated successfully
