@@ -71,19 +71,26 @@ const options: swaggerJSDoc.Options = {
       schemas: {
         Error: {
           type: 'object',
+          required: ['status', 'message'],
           properties: {
-            error: {
+            status: {
+              type: 'integer',
+              description: 'HTTP status code',
+              example: 400,
+            },
+            message: {
               type: 'string',
               description: 'Error message',
+              example: 'Validation failed',
             },
-            status: {
-              type: 'number',
-              description: 'HTTP status code',
-            },
-            timestamp: {
-              type: 'string',
-              format: 'date-time',
-              description: 'Error timestamp',
+            details: {
+              type: 'object',
+              additionalProperties: true,
+              description: 'Additional error details (optional)',
+              example: {
+                field: 'email',
+                issue: 'invalid format',
+              },
             },
           },
         },
@@ -116,12 +123,14 @@ const options: swaggerJSDoc.Options = {
             createdAt: {
               type: 'string',
               format: 'date-time',
-              description: 'User creation timestamp',
+              description: 'User creation timestamp with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
             updatedAt: {
               type: 'string',
               format: 'date-time',
-              description: 'User last update timestamp',
+              description: 'User last update timestamp with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
           },
         },
@@ -147,12 +156,14 @@ const options: swaggerJSDoc.Options = {
             createdAt: {
               type: 'string',
               format: 'date-time',
-              description: 'Group creation timestamp',
+              description: 'Group creation timestamp with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
             updatedAt: {
               type: 'string',
               format: 'date-time',
-              description: 'Group last update timestamp',
+              description: 'Group last update timestamp with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
           },
         },
@@ -186,12 +197,14 @@ const options: swaggerJSDoc.Options = {
             createdAt: {
               type: 'string',
               format: 'date-time',
-              description: 'Account creation timestamp',
+              description: 'Account creation timestamp with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
             updatedAt: {
               type: 'string',
               format: 'date-time',
-              description: 'Account last update timestamp',
+              description: 'Account last update timestamp with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
           },
         },
@@ -224,12 +237,14 @@ const options: swaggerJSDoc.Options = {
             createdAt: {
               type: 'string',
               format: 'date-time',
-              description: 'Category creation timestamp',
+              description: 'Category creation timestamp with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
             updatedAt: {
               type: 'string',
               format: 'date-time',
-              description: 'Category last update timestamp',
+              description: 'Category last update timestamp with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
           },
         },
@@ -271,8 +286,9 @@ const options: swaggerJSDoc.Options = {
             },
             date: {
               type: 'string',
-              format: 'date',
-              description: 'Transaction date',
+              format: 'date-time',
+              description: 'Transaction date with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
             note: {
               type: 'string',
@@ -287,12 +303,14 @@ const options: swaggerJSDoc.Options = {
             createdAt: {
               type: 'string',
               format: 'date-time',
-              description: 'Transaction creation timestamp',
+              description: 'Transaction creation timestamp with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
             updatedAt: {
               type: 'string',
               format: 'date-time',
-              description: 'Transaction last update timestamp',
+              description: 'Transaction last update timestamp with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
           },
         },
@@ -338,12 +356,14 @@ const options: swaggerJSDoc.Options = {
             createdAt: {
               type: 'string',
               format: 'date-time',
-              description: 'Account limit creation timestamp',
+              description: 'Account limit creation timestamp with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
             updatedAt: {
               type: 'string',
               format: 'date-time',
-              description: 'Account limit last update timestamp',
+              description: 'Account limit last update timestamp with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
           },
         },
@@ -366,24 +386,28 @@ const options: swaggerJSDoc.Options = {
             },
             nextOccurrenceDate: {
               type: 'string',
-              format: 'date',
-              description: 'Next occurrence date',
+              format: 'date-time',
+              description: 'Next occurrence date with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
             endDate: {
               type: 'string',
-              format: 'date',
+              format: 'date-time',
               nullable: true,
-              description: 'End date for recurrence',
+              description: 'End date for recurrence with timezone support',
+              example: '2023-12-31T23:59:59Z',
             },
             createdAt: {
               type: 'string',
               format: 'date-time',
-              description: 'Recurrence creation timestamp',
+              description: 'Recurrence creation timestamp with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
             updatedAt: {
               type: 'string',
               format: 'date-time',
-              description: 'Recurrence last update timestamp',
+              description: 'Recurrence last update timestamp with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
           },
         },
@@ -405,18 +429,21 @@ const options: swaggerJSDoc.Options = {
             expires: {
               type: 'string',
               format: 'date-time',
-              description: 'Token expiration timestamp',
+              description: 'Token expiration timestamp with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
             createdAt: {
               type: 'string',
               format: 'date-time',
-              description: 'Token creation timestamp',
+              description: 'Token creation timestamp with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
             revokedAt: {
               type: 'string',
               format: 'date-time',
               nullable: true,
-              description: 'Token revocation timestamp',
+              description: 'Token revocation timestamp with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
             replacedByToken: {
               type: 'string',
@@ -643,6 +670,81 @@ const options: swaggerJSDoc.Options = {
             },
           },
         },
+        UserRegistration: {
+          type: 'object',
+          required: ['name', 'email', 'password'],
+          properties: {
+            name: {
+              type: 'string',
+              maxLength: 255,
+              description: 'User full name',
+              example: 'John Doe',
+            },
+            email: {
+              type: 'string',
+              format: 'email',
+              maxLength: 255,
+              description: 'User email address',
+              example: 'john.doe@example.com',
+            },
+            password: {
+              type: 'string',
+              minLength: 8,
+              description: 'User password (minimum 8 characters)',
+              example: 'securePassword123',
+            },
+          },
+        },
+        GroupRegistration: {
+          type: 'object',
+          required: ['name'],
+          properties: {
+            name: {
+              type: 'string',
+              maxLength: 255,
+              description: 'Group name',
+              example: 'Doe Family Budget',
+            },
+            defaultCurrency: {
+              type: 'string',
+              minLength: 3,
+              maxLength: 3,
+              nullable: true,
+              description: 'Default currency for the group (3-letter code)',
+              example: 'USD',
+            },
+          },
+        },
+        RegistrationRequest: {
+          type: 'object',
+          required: ['user', 'group'],
+          properties: {
+            user: {
+              $ref: '#/components/schemas/UserRegistration',
+            },
+            group: {
+              $ref: '#/components/schemas/GroupRegistration',
+            },
+          },
+        },
+        LoginRequest: {
+          type: 'object',
+          required: ['email', 'password'],
+          properties: {
+            email: {
+              type: 'string',
+              format: 'email',
+              description: 'User email address',
+              example: 'john.doe@example.com',
+            },
+            password: {
+              type: 'string',
+              format: 'password',
+              description: 'User password',
+              example: 'securePassword123',
+            },
+          },
+        },
         NewAccount: {
           type: 'object',
           required: ['groupId', 'name', 'type'],
@@ -800,14 +902,16 @@ const options: swaggerJSDoc.Options = {
             },
             nextOccurrenceDate: {
               type: 'string',
-              format: 'date',
-              description: 'Next occurrence date',
+              format: 'date-time',
+              description: 'Next occurrence date with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
             endDate: {
               type: 'string',
-              format: 'date',
+              format: 'date-time',
               nullable: true,
-              description: 'End date for recurrence',
+              description: 'End date for recurrence with timezone support',
+              example: '2023-12-31T23:59:59Z',
             },
           },
         },
@@ -826,14 +930,16 @@ const options: swaggerJSDoc.Options = {
             },
             nextOccurrenceDate: {
               type: 'string',
-              format: 'date',
-              description: 'Next occurrence date',
+              format: 'date-time',
+              description: 'Next occurrence date with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
             endDate: {
               type: 'string',
-              format: 'date',
+              format: 'date-time',
               nullable: true,
-              description: 'End date for recurrence',
+              description: 'End date for recurrence with timezone support',
+              example: '2023-12-31T23:59:59Z',
             },
           },
         },
@@ -872,8 +978,9 @@ const options: swaggerJSDoc.Options = {
             },
             date: {
               type: 'string',
-              format: 'date',
-              description: 'Transaction date',
+              format: 'date-time',
+              description: 'Transaction date with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
             note: {
               type: 'string',
@@ -921,8 +1028,9 @@ const options: swaggerJSDoc.Options = {
             },
             date: {
               type: 'string',
-              format: 'date',
-              description: 'Transaction date',
+              format: 'date-time',
+              description: 'Transaction date with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
             note: {
               type: 'string',
@@ -951,13 +1059,15 @@ const options: swaggerJSDoc.Options = {
             expires: {
               type: 'string',
               format: 'date-time',
-              description: 'Token expiration timestamp',
+              description: 'Token expiration timestamp with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
             revokedAt: {
               type: 'string',
               format: 'date-time',
               nullable: true,
-              description: 'Token revocation timestamp',
+              description: 'Token revocation timestamp with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
             replacedByToken: {
               type: 'string',
@@ -980,13 +1090,15 @@ const options: swaggerJSDoc.Options = {
             expires: {
               type: 'string',
               format: 'date-time',
-              description: 'Token expiration timestamp',
+              description: 'Token expiration timestamp with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
             revokedAt: {
               type: 'string',
               format: 'date-time',
               nullable: true,
-              description: 'Token revocation timestamp',
+              description: 'Token revocation timestamp with timezone support',
+              example: '2023-12-01T10:30:00Z',
             },
             replacedByToken: {
               type: 'string',
@@ -1177,13 +1289,15 @@ const options: swaggerJSDoc.Options = {
                 },
                 startDate: {
                   type: 'string',
-                  format: 'date',
-                  description: 'Filter transactions from this date',
+                  format: 'date-time',
+                  description: 'Filter transactions from this date with timezone support',
+                  example: '2023-12-01T00:00:00Z',
                 },
                 endDate: {
                   type: 'string',
-                  format: 'date',
-                  description: 'Filter transactions until this date',
+                  format: 'date-time',
+                  description: 'Filter transactions until this date with timezone support',
+                  example: '2023-12-31T23:59:59Z',
                 },
                 currency: {
                   type: 'string',
@@ -1249,13 +1363,15 @@ const options: swaggerJSDoc.Options = {
                 },
                 startDate: {
                   type: 'string',
-                  format: 'date',
-                  description: 'Filter recurrences starting from this date',
+                  format: 'date-time',
+                  description: 'Filter recurrences starting from this date with timezone support',
+                  example: '2023-12-01T00:00:00Z',
                 },
                 endDate: {
                   type: 'string',
-                  format: 'date',
-                  description: 'Filter recurrences ending before this date',
+                  format: 'date-time',
+                  description: 'Filter recurrences ending before this date with timezone support',
+                  example: '2023-12-31T23:59:59Z',
                 },
                 sortBy: {
                   type: 'string',

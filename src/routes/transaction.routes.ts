@@ -52,14 +52,14 @@ const router = Router();
  *         name: startDate
  *         schema:
  *           type: string
- *           format: date
- *         description: Filter transactions from this date (YYYY-MM-DD)
+ *           format: date-time
+ *         description: Filter transactions from this date with timezone support
  *       - in: query
  *         name: endDate
  *         schema:
  *           type: string
- *           format: date
- *         description: Filter transactions until this date (YYYY-MM-DD)
+ *           format: date-time
+ *         description: Filter transactions until this date with timezone support
  *       - in: query
  *         name: currency
  *         schema:
@@ -106,7 +106,7 @@ const router = Router();
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/PaginatedResponse'
+ *               $ref: '#/components/schemas/PagedTransactions'
  *       401:
  *         description: Unauthorized
  *         content:
@@ -128,49 +128,7 @@ const router = Router();
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - note
- *               - amount
- *               - date
- *               - accountId
- *               - categoryId
- *             properties:
- *               note:
- *                 type: string
- *                 maxLength: 500
- *                 description: Transaction note or description
- *                 example: "Grocery shopping at Walmart"
- *               amount:
- *                 type: number
- *                 multipleOf: 0.01
- *                 description: Transaction amount (in cents or smallest currency unit)
- *                 example: 8550
- *               date:
- *                 type: string
- *                 format: date
- *                 description: Transaction date (YYYY-MM-DD)
- *                 example: "2025-01-25"
- *               accountId:
- *                 type: integer
- *                 description: Account ID for this transaction
- *                 example: 1
- *               categoryId:
- *                 type: integer
- *                 description: Category ID for this transaction
- *                 example: 2
- *               currency:
- *                 type: string
- *                 minLength: 3
- *                 maxLength: 3
- *                 nullable: true
- *                 description: Currency code (3 letters)
- *                 example: "USD"
- *               recurrenceId:
- *                 type: integer
- *                 nullable: true
- *                 description: Recurrence ID if this is a recurring transaction
- *                 example: null
+ *             $ref: '#/components/schemas/NewTransaction'
  *     responses:
  *       201:
  *         description: Transaction created successfully
@@ -250,25 +208,7 @@ router.post('/', createTransaction);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               description:
- *                 type: string
- *                 description: Transaction description
- *               amount:
- *                 type: number
- *                 format: decimal
- *                 description: Transaction amount
- *               date:
- *                 type: string
- *                 format: date
- *                 description: Transaction date
- *               accountId:
- *                 type: string
- *                 description: Account ID
- *               categoryId:
- *                 type: string
- *                 description: Category ID
+ *             $ref: '#/components/schemas/UpdateTransaction'
  *     responses:
  *       200:
  *         description: Transaction updated successfully

@@ -18,18 +18,7 @@ const router = Router();
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - name
- *             properties:
- *               name:
- *                 type: string
- *                 description: Group name
- *                 example: "Household Budget"
- *               description:
- *                 type: string
- *                 description: Group description
- *                 example: "Managing household expenses and income"
+ *             $ref: '#/components/schemas/NewGroup'
  *     responses:
  *       201:
  *         description: Group created successfully
@@ -138,16 +127,7 @@ router.get('/:id', getGroup);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 description: Group name
- *                 example: "Updated Household Budget"
- *               description:
- *                 type: string
- *                 description: Group description
- *                 example: "Updated description for household expenses"
+ *             $ref: '#/components/schemas/UpdateGroup'
  *     responses:
  *       200:
  *         description: Group updated successfully
