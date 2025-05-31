@@ -36,3 +36,11 @@ export {
 
 // Summary controller functions
 export { getSummary } from './summary.controller.ts';
+
+// User preference controller functions
+export {
+  getCurrentUserPreferences,
+  updateCurrentUserPreferences,
+  deleteUserPreference,
+  resetCurrentUserPreferences,
+} from './user-preference.controller.ts';
