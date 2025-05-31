@@ -34,6 +34,14 @@ export {
   listCategoryTransactions,
 } from './transaction.controller.ts';
 
+// Transaction recurrence controller functions
+export {
+  getTransactionRecurrence,
+  createTransactionRecurrence,
+  updateTransactionRecurrence,
+  deleteTransactionRecurrence,
+} from './transaction-recurrence.controller.ts';
+
 // Summary controller functions
 export { getSummary } from './summary.controller.ts';
 

@@ -8,6 +8,8 @@ import {
   deleteTransaction,
 } from '../controllers/index.ts';
 
+import transactionRecurrenceRoutes from './transaction-recurrence.routes.ts';
+
 const router = Router();
 
 /**
@@ -270,5 +272,8 @@ router.post('/', createTransaction);
 router.get('/:id', getTransaction);
 router.patch('/:id', updateTransaction);
 router.delete('/:id', deleteTransaction);
+
+// Mount transaction recurrence routes
+router.use('/:transactionId/recurrence', transactionRecurrenceRoutes);
 
 export default router;
