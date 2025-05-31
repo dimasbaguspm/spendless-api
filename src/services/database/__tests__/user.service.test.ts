@@ -51,6 +51,7 @@ describe('UserService', () => {
     passwordHash: 'hashedpassword',
     name: 'Test User',
     isActive: true,
+    isOnboard: false,
     createdAt: '2024-01-01T00:00:00.000Z',
     updatedAt: '2024-01-01T00:00:00.000Z',
   };
@@ -110,6 +111,7 @@ describe('UserService', () => {
         email: 'test@example.com',
         name: 'Test',
         isActive: true,
+        isOnboard: false,
         sortBy: 'name',
         sortOrder: 'desc',
         pageSize: 10,
@@ -128,6 +130,7 @@ describe('UserService', () => {
       expect(mockEq).toHaveBeenCalledWith(users.email, 'test@example.com');
       expect(mockEq).toHaveBeenCalledWith(users.name, 'Test');
       expect(mockEq).toHaveBeenCalledWith(users.isActive, true);
+      expect(mockEq).toHaveBeenCalledWith(users.isOnboard, false);
       expect(mockDesc).toHaveBeenCalledWith(users.name);
       expect(result).toEqual({ ...pagedUser, pageSize: 10, pageNumber: 2 });
     });
@@ -147,7 +150,7 @@ describe('UserService', () => {
 
   describe('getSingle', () => {
     it('should get a single user by conditions', async () => {
-      const filters = { id: 1, groupId: 1 };
+      const filters = { id: 1, groupId: 1, isOnboard: true };
 
       mockValidate.mockResolvedValue({ data: filters });
 
@@ -163,6 +166,7 @@ describe('UserService', () => {
       expect(mockValidate).toHaveBeenCalledWith(expect.any(Object), filters);
       expect(mockEq).toHaveBeenCalledWith(users.id, 1);
       expect(mockEq).toHaveBeenCalledWith(users.groupId, 1);
+      expect(mockEq).toHaveBeenCalledWith(users.isOnboard, true);
       expect(mockAnd).toHaveBeenCalled();
       expect(result).toEqual(mockUser);
     });
@@ -213,8 +217,40 @@ describe('UserService', () => {
         name: userData.name,
         groupId: userData.groupId,
         isActive: false,
+        isOnboard: false,
       });
       expect(result).toEqual(mockUser);
+    });
+
+    it('should create a new user with isOnboard set to false by default', async () => {
+      const userData = {
+        email: 'newuser@example.com',
+        password: 'hashedpassword',
+        name: 'New User',
+        groupId: 1,
+      };
+
+      mockValidate.mockResolvedValue({ data: userData });
+
+      const newUser = { ...mockUser, email: userData.email, name: userData.name, isOnboard: false };
+      const mockInsert = vi.fn().mockReturnValue({
+        values: vi.fn().mockReturnValue({
+          returning: vi.fn().mockResolvedValue([newUser]),
+        }),
+      });
+      mockDb.insert.mockReturnValue(mockInsert());
+
+      const result = await userService.createSingle(userData);
+
+      expect(mockInsert().values).toHaveBeenCalledWith({
+        email: userData.email,
+        passwordHash: userData.password,
+        name: userData.name,
+        groupId: userData.groupId,
+        isActive: false,
+        isOnboard: false,
+      });
+      expect(result.isOnboard).toBe(false);
     });
   });
 
@@ -225,6 +261,7 @@ describe('UserService', () => {
         name: 'Updated Name',
         email: 'updated@example.com',
         isActive: false,
+        isOnboard: true,
       };
 
       mockValidate.mockResolvedValue({ data: updateData });
@@ -245,6 +282,33 @@ describe('UserService', () => {
       expect(mockUpdate().set).toHaveBeenCalledWith(updateData);
       expect(mockEq).toHaveBeenCalledWith(users.id, id);
       expect(result).toEqual({ ...mockUser, ...updateData });
+    });
+
+    it('should update user onboarding status', async () => {
+      const id = 1;
+      const onboardingData = {
+        isOnboard: true,
+      };
+
+      mockValidate.mockResolvedValue({ data: onboardingData });
+
+      const onboardedUser = { ...mockUser, isOnboard: true };
+      const mockUpdate = vi.fn().mockReturnValue({
+        set: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({
+            returning: vi.fn().mockResolvedValue([onboardedUser]),
+          }),
+        }),
+      });
+      mockDb.update.mockReturnValue(mockUpdate());
+
+      const result = await userService.updateSingle(id, onboardingData);
+
+      expect(mockValidate).toHaveBeenCalledWith(expect.any(Object), onboardingData);
+      expect(mockDb.update).toHaveBeenCalledWith(users);
+      expect(mockUpdate().set).toHaveBeenCalledWith(onboardingData);
+      expect(mockEq).toHaveBeenCalledWith(users.id, id);
+      expect(result.isOnboard).toBe(true);
     });
   });
 

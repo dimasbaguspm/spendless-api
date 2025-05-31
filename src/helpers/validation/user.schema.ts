@@ -10,6 +10,7 @@ export const createUserSchema = z.object({
   passwordHash: z.string().min(1, 'Password hash is required').max(255, 'Password hash must be at most 255 characters'),
   name: z.string().min(1, 'Name is required').max(255, 'Name must be at most 255 characters'),
   isActive: z.boolean().default(true),
+  isOnboard: z.boolean().default(false),
 });
 
 // Schema for updating a user
@@ -34,6 +35,7 @@ export const userQuerySchema = z.object({
     .optional()
     .transform((val) => (val === '' ? undefined : val)),
   isActive: z.boolean().optional(),
+  isOnboard: z.boolean().optional(),
   pageNumber: z.coerce.number().min(1).optional().default(1),
   pageSize: z.coerce.number().min(1).optional().default(25),
   sortBy: z

@@ -21,6 +21,7 @@ export class UserService implements DatabaseServiceSchema<User> {
       email,
       name,
       isActive,
+      isOnboard,
       sortBy = 'createdAt',
       sortOrder = 'asc',
       pageSize = 25,
@@ -34,6 +35,7 @@ export class UserService implements DatabaseServiceSchema<User> {
     if (email !== undefined) conditions.push(eq(users.email, email));
     if (name !== undefined) conditions.push(eq(users.name, name));
     if (isActive !== undefined) conditions.push(eq(users.isActive, isActive));
+    if (isOnboard !== undefined) conditions.push(eq(users.isOnboard, isOnboard));
 
     // sorting
     const isAscending = sortOrder === 'asc';
@@ -83,7 +85,7 @@ export class UserService implements DatabaseServiceSchema<User> {
   async getSingle(filters?: unknown) {
     const { data } = await validate(userQuerySchema, filters ?? {});
 
-    const { groupId, email, name, isActive, id } = data;
+    const { groupId, email, name, isActive, isOnboard, id } = data;
 
     const conditions = [];
     if (id) conditions.push(eq(users.id, id));
@@ -91,6 +93,7 @@ export class UserService implements DatabaseServiceSchema<User> {
     if (email) conditions.push(eq(users.email, email));
     if (name) conditions.push(eq(users.name, name));
     if (isActive) conditions.push(eq(users.isActive, isActive));
+    if (isOnboard !== undefined) conditions.push(eq(users.isOnboard, isOnboard));
 
     const [user] = await db
       .select()
@@ -112,6 +115,7 @@ export class UserService implements DatabaseServiceSchema<User> {
         name: data.name,
         groupId: data.groupId,
         isActive: false,
+        isOnboard: false,
       })
       .returning();
     return formatUserModel(user);
@@ -130,6 +134,7 @@ export class UserService implements DatabaseServiceSchema<User> {
         name: data.name,
         email: data.email,
         isActive: data.isActive,
+        isOnboard: data.isOnboard,
       })
       .where(eq(users.id, idNum))
       .returning();
