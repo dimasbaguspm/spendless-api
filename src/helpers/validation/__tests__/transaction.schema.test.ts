@@ -159,6 +159,72 @@ describe('Transaction Schema Validation', () => {
       expect(createTransactionSchema.safeParse(invalidData1).success).toBe(false);
       expect(createTransactionSchema.safeParse(invalidData2).success).toBe(false);
     });
+
+    it('should validate transaction with isHighlighted true', () => {
+      const validData = {
+        groupId: 1,
+        accountId: 2,
+        categoryId: 3,
+        createdByUserId: 4,
+        amount: 100,
+        currency: 'USD',
+        type: 'expense',
+        date: '2024-05-24',
+        isHighlighted: true,
+      };
+
+      const result = createTransactionSchema.safeParse(validData);
+
+      expect(result.success).toBe(true);
+      expect(result.data).toEqual(validData);
+      expect(result.data?.isHighlighted).toBe(true);
+    });
+
+    it('should validate transaction with isHighlighted false', () => {
+      const validData = {
+        groupId: 1,
+        accountId: 2,
+        categoryId: 3,
+        createdByUserId: 4,
+        amount: 100,
+        currency: 'USD',
+        type: 'expense',
+        date: '2024-05-24',
+        isHighlighted: false,
+      };
+
+      const result = createTransactionSchema.safeParse(validData);
+
+      expect(result.success).toBe(true);
+      expect(result.data).toEqual(validData);
+      expect(result.data?.isHighlighted).toBe(false);
+    });
+
+    it('should reject non-boolean isHighlighted values', () => {
+      const invalidData = {
+        groupId: 1,
+        accountId: 2,
+        categoryId: 3,
+        createdByUserId: 4,
+        amount: 100,
+        currency: 'USD',
+        type: 'expense',
+        date: '2024-05-24',
+        isHighlighted: 'true',
+      };
+
+      const result = createTransactionSchema.safeParse(invalidData);
+
+      expect(result.success).toBe(false);
+      expect(result.error?.errors).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            message: 'Expected boolean, received string',
+            path: ['isHighlighted'],
+          }),
+        ])
+      );
+    });
   });
 
   describe('updateTransactionSchema', () => {
@@ -209,6 +275,48 @@ describe('Transaction Schema Validation', () => {
       expect(result.success).toBe(true);
       expect(result.data).toEqual(validData);
     });
+
+    it('should validate updating isHighlighted to true', () => {
+      const validData = {
+        isHighlighted: true,
+      };
+
+      const result = updateTransactionSchema.safeParse(validData);
+
+      expect(result.success).toBe(true);
+      expect(result.data).toEqual(validData);
+      expect(result.data?.isHighlighted).toBe(true);
+    });
+
+    it('should validate updating isHighlighted to false', () => {
+      const validData = {
+        isHighlighted: false,
+      };
+
+      const result = updateTransactionSchema.safeParse(validData);
+
+      expect(result.success).toBe(true);
+      expect(result.data).toEqual(validData);
+      expect(result.data?.isHighlighted).toBe(false);
+    });
+
+    it('should reject non-boolean isHighlighted in updates', () => {
+      const invalidData = {
+        isHighlighted: 'false',
+      };
+
+      const result = updateTransactionSchema.safeParse(invalidData);
+
+      expect(result.success).toBe(false);
+      expect(result.error?.errors).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            message: 'Expected boolean, received string',
+            path: ['isHighlighted'],
+          }),
+        ])
+      );
+    });
   });
 
   describe('transactionQuerySchema', () => {
@@ -219,6 +327,7 @@ describe('Transaction Schema Validation', () => {
         accountId: 3,
         categoryId: 4,
         createdByUserId: 5,
+        isHighlighted: true,
         note: 'search term',
         startDate: '2024-01-01',
         endDate: '2024-12-31',
@@ -349,6 +458,64 @@ describe('Transaction Schema Validation', () => {
         expect.arrayContaining([
           expect.objectContaining({
             message: 'sortOrder must be one of: asc, desc',
+          }),
+        ])
+      );
+    });
+
+    it('should validate isHighlighted filter as true', () => {
+      const validData = {
+        isHighlighted: true,
+      };
+
+      const result = transactionQuerySchema.safeParse(validData);
+
+      expect(result.success).toBe(true);
+      expect(result.data?.isHighlighted).toBe(true);
+    });
+
+    it('should validate isHighlighted filter as false', () => {
+      const validData = {
+        isHighlighted: false,
+      };
+
+      const result = transactionQuerySchema.safeParse(validData);
+
+      expect(result.success).toBe(true);
+      expect(result.data?.isHighlighted).toBe(false);
+    });
+
+    it('should reject non-boolean isHighlighted in query', () => {
+      const invalidData = {
+        isHighlighted: 'true',
+      };
+
+      const result = transactionQuerySchema.safeParse(invalidData);
+
+      expect(result.success).toBe(false);
+      expect(result.error?.errors).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            message: 'Expected boolean, received string',
+            path: ['isHighlighted'],
+          }),
+        ])
+      );
+    });
+
+    it('should reject invalid isHighlighted values', () => {
+      const invalidData = {
+        isHighlighted: 1,
+      };
+
+      const result = transactionQuerySchema.safeParse(invalidData);
+
+      expect(result.success).toBe(false);
+      expect(result.error?.errors).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            message: 'Expected boolean, received number',
+            path: ['isHighlighted'],
           }),
         ])
       );

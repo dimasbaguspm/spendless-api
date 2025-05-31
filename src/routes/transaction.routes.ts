@@ -81,6 +81,11 @@ const router = Router();
  *           type: integer
  *         description: Filter by recurrence ID
  *       - in: query
+ *         name: isHighlighted
+ *         schema:
+ *           type: boolean
+ *         description: Filter by highlighted status
+ *       - in: query
  *         name: pageNumber
  *         schema:
  *           type: integer

@@ -14,6 +14,7 @@ export const createTransactionSchema = z.object({
   type: z.string().refine((val) => ['expense', 'income', 'transfer'].includes(val), {
     message: 'Transaction type must be one of: expense, income, transfer',
   }),
+  isHighlighted: z.boolean().optional(),
   date: z.string(), // DB is date, accept string (ISO)
   note: z.string().nullable().optional(),
   recurrenceId: z.number().int().nullable().optional(), // nullable in DB, so optional here
@@ -29,6 +30,7 @@ export const transactionQuerySchema = z.object({
   accountId: z.number().int().positive().optional(),
   categoryId: z.number().int().optional(),
   createdByUserId: z.number().int().optional(),
+  isHighlighted: z.boolean().optional(),
   note: z
     .string()
     .optional()
