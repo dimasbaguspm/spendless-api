@@ -9,7 +9,7 @@ import {
   updateCategorySchema,
 } from '../../helpers/validation/category.schema.ts';
 import { validate } from '../../helpers/validation/index.ts';
-import { categories, Category, PagedCategories } from '../../models/schema.ts';
+import { categories, Category, NewCategory, PagedCategories } from '../../models/schema.ts';
 import { DatabaseServiceSchema } from '../../types/index.ts';
 
 export class CategoryService implements DatabaseServiceSchema<Category> {
@@ -92,7 +92,16 @@ export class CategoryService implements DatabaseServiceSchema<Category> {
    */
   async createSingle(payload: unknown) {
     const { data } = await validate(createCategorySchema, payload);
-    const [category] = await db.insert(categories).values(data).returning();
+
+    const currentCategory = {
+      groupId: data.groupId,
+      name: data.name,
+      parentId: data.parentId ?? null,
+      metadata: data.metadata ?? null,
+      note: data.note ?? null,
+    } satisfies NewCategory;
+
+    const [category] = await db.insert(categories).values(currentCategory).returning();
     return formatCategoryModel(category);
   }
 
@@ -102,6 +111,7 @@ export class CategoryService implements DatabaseServiceSchema<Category> {
   async updateSingle(id: unknown, payload: unknown) {
     const idNum = parseId(id);
     const { data } = await validate(updateCategorySchema, payload);
+
     const [category] = await db
       .update(categories)
       .set({ ...data, updatedAt: new Date().toISOString() })

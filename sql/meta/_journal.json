@@ -43,6 +43,13 @@
       "when": 1748684571864,
       "tag": "0005_small_rocket_racer",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1748691122495,
+      "tag": "0006_marvelous_brother_voodoo",
+      "breakpoints": true
     }
   ]
 }

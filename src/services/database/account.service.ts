@@ -92,6 +92,7 @@ export class AccountService implements DatabaseServiceSchema<Account> {
       type: data.type,
       groupId: data.groupId,
       note: data.note,
+      metadata: data.metadata ?? null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     } satisfies NewAccount;

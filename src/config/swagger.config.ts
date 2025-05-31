@@ -198,6 +198,17 @@ const options: swaggerJSDoc.Options = {
               nullable: true,
               description: 'Optional account notes',
             },
+            metadata: {
+              type: 'object',
+              nullable: true,
+              additionalProperties: true,
+              description: 'Optional metadata for storing custom account information as key-value pairs',
+              example: {
+                bankCode: 'ABC123',
+                accountNumber: '1234567890',
+                branch: 'Main Branch',
+              },
+            },
             createdAt: {
               type: 'string',
               format: 'date-time',
@@ -237,6 +248,17 @@ const options: swaggerJSDoc.Options = {
               type: 'string',
               nullable: true,
               description: 'Optional category notes',
+            },
+            metadata: {
+              type: 'object',
+              nullable: true,
+              additionalProperties: true,
+              description: 'Optional metadata for storing custom category information as key-value pairs',
+              example: {
+                categoryType: 'expense',
+                color: '#FF5733',
+                icon: 'shopping-cart',
+              },
             },
             createdAt: {
               type: 'string',
@@ -794,6 +816,17 @@ const options: swaggerJSDoc.Options = {
               nullable: true,
               description: 'Optional account notes',
             },
+            metadata: {
+              type: 'object',
+              nullable: true,
+              additionalProperties: true,
+              description: 'Optional metadata for storing custom account information as key-value pairs',
+              example: {
+                bankCode: 'ABC123',
+                accountNumber: '1234567890',
+                branch: 'Main Branch',
+              },
+            },
           },
         },
         UpdateAccount: {
@@ -818,6 +851,17 @@ const options: swaggerJSDoc.Options = {
               type: 'string',
               nullable: true,
               description: 'Optional account notes',
+            },
+            metadata: {
+              type: 'object',
+              nullable: true,
+              additionalProperties: true,
+              description: 'Optional metadata for storing custom account information as key-value pairs',
+              example: {
+                bankCode: 'ABC123',
+                accountNumber: '1234567890',
+                branch: 'Main Branch',
+              },
             },
           },
         },
@@ -885,6 +929,17 @@ const options: swaggerJSDoc.Options = {
               nullable: true,
               description: 'Optional category notes',
             },
+            metadata: {
+              type: 'object',
+              nullable: true,
+              additionalProperties: true,
+              description: 'Optional metadata for storing custom category information as key-value pairs',
+              example: {
+                categoryType: 'expense',
+                color: '#FF5733',
+                icon: 'shopping-cart',
+              },
+            },
           },
         },
         UpdateCategory: {
@@ -908,6 +963,17 @@ const options: swaggerJSDoc.Options = {
               type: 'string',
               nullable: true,
               description: 'Optional category notes',
+            },
+            metadata: {
+              type: 'object',
+              nullable: true,
+              additionalProperties: true,
+              description: 'Optional metadata for storing custom category information as key-value pairs',
+              example: {
+                categoryType: 'expense',
+                color: '#FF5733',
+                icon: 'shopping-cart',
+              },
             },
           },
         },

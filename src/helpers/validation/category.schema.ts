@@ -8,6 +8,7 @@ export const createCategorySchema = z.object({
   groupId: z.number().int().positive('Group ID is required'),
   parentId: z.number().int().nullable().optional(), // nullable in DB, so optional here
   name: z.string().max(100, 'Name must be at most 100 characters').min(1, 'Name is required'),
+  metadata: z.object({}).passthrough().or(z.null()).default(null).optional().nullable(),
   note: z.string().nullable().optional(),
 });
 
