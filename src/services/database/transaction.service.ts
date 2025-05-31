@@ -26,6 +26,7 @@ export class TransactionService implements DatabaseServiceSchema<Transaction> {
       startDate,
       endDate,
       note,
+      type,
       pageNumber = 1,
       pageSize = 25,
       sortBy = 'createdAt',
@@ -40,6 +41,7 @@ export class TransactionService implements DatabaseServiceSchema<Transaction> {
     if (startDate !== undefined) conditions.push(gte(transactions.date, startDate));
     if (endDate !== undefined) conditions.push(lte(transactions.date, endDate));
     if (note !== undefined) conditions.push(ilike(transactions.note, `%${note}%`));
+    if (type !== undefined) conditions.push(eq(transactions.type, type));
 
     // Sorting
     const isAscending = sortOrder === 'asc';

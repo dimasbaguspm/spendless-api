@@ -98,6 +98,7 @@ export const transactions = pgTable('transactions', {
     .references(() => users.id),
   amount: decimal('amount', { precision: 14, scale: 2 }).$type<number>().notNull(),
   currency: varchar('currency', { length: 3 }).notNull(),
+  type: varchar('type', { length: 8 }).notNull(), // 'expense', 'income', 'transfer'
   date: timestamp('date', { mode: 'string', withTimezone: true }).$type<string>().notNull(), // date of the transaction
   note: text('note'),
   recurrenceId: integer('recurrence_id')

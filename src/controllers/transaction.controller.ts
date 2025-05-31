@@ -63,7 +63,8 @@ export async function createTransaction(req: Request, res: Response) {
       payload.accountId as number,
       payload.amount as number,
       payload.date as string,
-      user.id
+      user.id,
+      payload.type as string
     );
 
     if (!validationResult.isValid) {
@@ -137,8 +138,13 @@ export async function updateTransaction(req: Request, res: Response) {
       }
     }
 
-    // Validate against account limits if amount, account, or date is being updated
-    if (payload?.amount !== undefined || payload?.accountId !== undefined || payload?.date !== undefined) {
+    // Validate against account limits if amount, account, date, or type is being updated
+    if (
+      payload?.amount !== undefined ||
+      payload?.accountId !== undefined ||
+      payload?.date !== undefined ||
+      payload?.type !== undefined
+    ) {
       const validationResult = await accountLimitValidationService.validateTransactionUpdateAgainstLimits(
         existingTransaction,
         payload,

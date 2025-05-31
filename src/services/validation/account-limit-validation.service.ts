@@ -31,13 +31,20 @@ export class AccountLimitValidationService {
 
   /**
    * Validate if a transaction can be created without exceeding account limits
+   * Only validates expense transactions against limits
    */
   async validateTransactionAgainstLimits(
     accountId: number,
     transactionAmount: number,
     transactionDate: string,
-    userId: number
+    userId: number,
+    transactionType: string = 'expense'
   ): Promise<AccountLimitValidationResult> {
+    // Only validate expense transactions against limits
+    if (transactionType !== 'expense') {
+      return { isValid: true, exceededLimits: [], warnings: [] };
+    }
+
     const limitData = await this.accountLimitService.getMany({ accountId });
     const limits = limitData.items;
 
@@ -97,22 +104,29 @@ export class AccountLimitValidationService {
   }
 
   async validateTransactionUpdateAgainstLimits(
-    existingTransaction: { accountId: number; amount: number; date: string },
-    updatePayload: { accountId?: number; amount?: number; date?: string },
+    existingTransaction: { accountId: number; amount: number; date: string; type: string },
+    updatePayload: { accountId?: number; amount?: number; date?: string; type?: string },
     userId: number
   ): Promise<AccountLimitValidationResult> {
     const currentAccountId = existingTransaction.accountId;
     const currentAmount = existingTransaction.amount;
     const currentDate = existingTransaction.date;
+    const currentType = existingTransaction.type;
 
     const newAccountId = updatePayload.accountId ?? currentAccountId;
     const newAmount = updatePayload.amount ?? currentAmount;
     const newDate = updatePayload.date ?? currentDate;
+    const newType = updatePayload.type ?? currentType;
+
+    // Only validate expense transactions against limits
+    if (newType !== 'expense') {
+      return { isValid: true, exceededLimits: [], warnings: [] };
+    }
 
     const amountDifference = newAmount - currentAmount;
 
     if (newAccountId !== currentAccountId) {
-      return this.validateTransactionAgainstLimits(newAccountId, newAmount, newDate, userId);
+      return this.validateTransactionAgainstLimits(newAccountId, newAmount, newDate, userId, newType);
     }
 
     // For same account updates, only validate the difference
@@ -120,7 +134,7 @@ export class AccountLimitValidationService {
       return { isValid: true, exceededLimits: [], warnings: [] };
     }
 
-    return this.validateTransactionAgainstLimits(currentAccountId, amountDifference, newDate, userId);
+    return this.validateTransactionAgainstLimits(currentAccountId, amountDifference, newDate, userId, newType);
   }
 
   /**

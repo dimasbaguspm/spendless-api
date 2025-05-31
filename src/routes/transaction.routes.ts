@@ -68,6 +68,12 @@ const router = Router();
  *           maxLength: 3
  *         description: Filter by currency code
  *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *           enum: [expense, income, transfer]
+ *         description: Filter by transaction type
+ *       - in: query
  *         name: recurrenceId
  *         schema:
  *           type: integer
