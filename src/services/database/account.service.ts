@@ -1,6 +1,7 @@
 import { SQL, and, asc, desc, eq, ilike } from 'drizzle-orm';
 
 import { db } from '../../core/db/config.ts';
+import { formatAccountModel } from '../../helpers/model-formatters/index.ts';
 import { parseId } from '../../helpers/parsers/index.ts';
 import {
   accountQuerySchema,
@@ -56,7 +57,7 @@ export class AccountService implements DatabaseServiceSchema<Account> {
     const [pagedData, totalData] = await Promise.all([pagedQuery.execute(), totalQuery.execute()]);
 
     return {
-      items: pagedData,
+      items: pagedData.map(formatAccountModel),
       pageSize: pageSize,
       pageNumber: pageNumber,
       totalItems: totalData.length,
@@ -80,7 +81,7 @@ export class AccountService implements DatabaseServiceSchema<Account> {
       .from(accounts)
       .where(and(...conditions));
 
-    return account;
+    return formatAccountModel(account);
   }
 
   async createSingle(payload: unknown): Promise<Account> {
@@ -97,7 +98,7 @@ export class AccountService implements DatabaseServiceSchema<Account> {
 
     const [account] = await db.insert(accounts).values(insertData).returning();
 
-    return account;
+    return formatAccountModel(account);
   }
 
   async updateSingle(id: unknown, payload: unknown): Promise<Account> {
@@ -111,13 +112,13 @@ export class AccountService implements DatabaseServiceSchema<Account> {
 
     const [account] = await db.update(accounts).set(updateData).where(eq(accounts.id, idNum)).returning();
 
-    return account;
+    return formatAccountModel(account);
   }
 
   async deleteSingle(id: unknown): Promise<Account> {
     const idNum = parseId(id);
     const [account] = await db.delete(accounts).where(eq(accounts.id, idNum)).returning();
 
-    return account;
+    return formatAccountModel(account);
   }
 }

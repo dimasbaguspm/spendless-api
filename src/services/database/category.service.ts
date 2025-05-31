@@ -1,6 +1,7 @@
 import { eq, and, asc, desc, ilike } from 'drizzle-orm';
 
 import { db } from '../../core/db/config.ts';
+import { formatCategoryModel } from '../../helpers/model-formatters/index.ts';
 import { parseId } from '../../helpers/parsers/index.ts';
 import {
   categoryQuerySchema,
@@ -55,7 +56,7 @@ export class CategoryService implements DatabaseServiceSchema<Category> {
     const [pagedData, totalData] = await Promise.all([pagedQuery.execute(), totalQuery.execute()]);
 
     return {
-      items: pagedData,
+      items: pagedData.map(formatCategoryModel),
       pageSize: pageSize,
       pageNumber: pageNumber,
       totalItems: totalData.length,
@@ -83,7 +84,7 @@ export class CategoryService implements DatabaseServiceSchema<Category> {
       .from(categories)
       .where(and(...conditions));
 
-    return category;
+    return formatCategoryModel(category);
   }
 
   /**
@@ -92,7 +93,7 @@ export class CategoryService implements DatabaseServiceSchema<Category> {
   async createSingle(payload: unknown) {
     const { data } = await validate(createCategorySchema, payload);
     const [category] = await db.insert(categories).values(data).returning();
-    return category;
+    return formatCategoryModel(category);
   }
 
   /**
@@ -106,7 +107,7 @@ export class CategoryService implements DatabaseServiceSchema<Category> {
       .set({ ...data, updatedAt: new Date().toISOString() })
       .where(eq(categories.id, idNum))
       .returning();
-    return category;
+    return formatCategoryModel(category);
   }
 
   /**
@@ -115,6 +116,6 @@ export class CategoryService implements DatabaseServiceSchema<Category> {
   async deleteSingle(id: unknown) {
     const idNum = parseId(id);
     const [category] = await db.delete(categories).where(eq(categories.id, idNum)).returning();
-    return category;
+    return formatCategoryModel(category);
   }
 }

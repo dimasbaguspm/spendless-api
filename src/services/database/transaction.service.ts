@@ -1,6 +1,7 @@
 import { SQL, and, asc, desc, eq, gte, ilike, lte } from 'drizzle-orm';
 
 import { db } from '../../core/db/config.ts';
+import { formatTransactionModel } from '../../helpers/model-formatters/index.ts';
 import { parseId } from '../../helpers/parsers/index.ts';
 import { validate } from '../../helpers/validation/index.ts';
 import {
@@ -74,7 +75,7 @@ export class TransactionService implements DatabaseServiceSchema<Transaction> {
     const [pagedData, totalData] = await Promise.all([pagedQuery.execute(), totalQuery.execute()]);
 
     return {
-      items: pagedData,
+      items: pagedData.map(formatTransactionModel),
       pageSize: pageSize,
       pageNumber: pageNumber,
       totalItems: totalData.length,
@@ -101,7 +102,7 @@ export class TransactionService implements DatabaseServiceSchema<Transaction> {
       .select()
       .from(transactions)
       .where(and(...conditions));
-    return transaction;
+    return formatTransactionModel(transaction);
   }
 
   /**
@@ -124,7 +125,7 @@ export class TransactionService implements DatabaseServiceSchema<Transaction> {
     } satisfies CreateTransactionInput;
 
     const [transaction] = await db.insert(transactions).values(insertData).returning();
-    return transaction;
+    return formatTransactionModel(transaction);
   }
 
   /**
@@ -141,7 +142,7 @@ export class TransactionService implements DatabaseServiceSchema<Transaction> {
       updatedAt: new Date().toISOString(),
     };
     const [transaction] = await db.update(transactions).set(updateData).where(eq(transactions.id, idNum)).returning();
-    return transaction;
+    return formatTransactionModel(transaction);
   }
 
   /**
@@ -150,6 +151,6 @@ export class TransactionService implements DatabaseServiceSchema<Transaction> {
   async deleteSingle(id: unknown) {
     const idNum = parseId(id);
     const [transaction] = await db.delete(transactions).where(eq(transactions.id, idNum)).returning();
-    return transaction;
+    return formatTransactionModel(transaction);
   }
 }

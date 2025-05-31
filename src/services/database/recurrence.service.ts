@@ -1,6 +1,7 @@
 import { SQL, and, asc, desc, eq, gte, lte } from 'drizzle-orm';
 
 import { db } from '../../core/db/config.ts';
+import { formatRecurrenceModel } from '../../helpers/model-formatters/index.ts';
 import { parseId } from '../../helpers/parsers/index.ts';
 import { validate } from '../../helpers/validation/index.ts';
 import {
@@ -69,7 +70,7 @@ export class RecurrenceService implements DatabaseServiceSchema<Recurrence> {
     const [pagedData, totalData] = await Promise.all([pagedQuery.execute(), totalQuery.execute()]);
 
     return {
-      items: pagedData,
+      items: pagedData.map(formatRecurrenceModel),
       pageSize: pageSize,
       pageNumber: pageNumber,
       totalItems: totalData.length,
@@ -95,7 +96,7 @@ export class RecurrenceService implements DatabaseServiceSchema<Recurrence> {
       .select()
       .from(recurrences)
       .where(and(...conditions));
-    return recurrence;
+    return formatRecurrenceModel(recurrence);
   }
 
   /**
@@ -112,7 +113,7 @@ export class RecurrenceService implements DatabaseServiceSchema<Recurrence> {
         nextOccurrenceDate: data.nextOccurrenceDate,
       })
       .returning();
-    return recurrence;
+    return formatRecurrenceModel(recurrence);
   }
 
   /**
@@ -126,7 +127,7 @@ export class RecurrenceService implements DatabaseServiceSchema<Recurrence> {
       updatedAt: new Date().toISOString(),
     };
     const [recurrence] = await db.update(recurrences).set(updateData).where(eq(recurrences.id, idNum)).returning();
-    return recurrence;
+    return formatRecurrenceModel(recurrence);
   }
 
   /**
@@ -135,6 +136,6 @@ export class RecurrenceService implements DatabaseServiceSchema<Recurrence> {
   async deleteSingle(id: unknown) {
     const idNum = parseId(id);
     const [recurrence] = await db.delete(recurrences).where(eq(recurrences.id, idNum)).returning();
-    return recurrence;
+    return formatRecurrenceModel(recurrence);
   }
 }

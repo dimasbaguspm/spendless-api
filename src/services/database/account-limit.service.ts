@@ -1,6 +1,7 @@
 import { SQL, and, asc, desc, eq } from 'drizzle-orm';
 
 import { db } from '../../core/db/config.ts';
+import { formatAccountLimitModel } from '../../helpers/model-formatters/index.ts';
 import { parseId } from '../../helpers/parsers/index.ts';
 import {
   accountLimitQuerySchema,
@@ -62,7 +63,7 @@ export class AccountLimitService implements DatabaseServiceSchema<AccountLimit> 
     const [pagedData, totalData] = await Promise.all([pagedQuery.execute(), totalQuery.execute()]);
 
     return {
-      items: pagedData,
+      items: pagedData.map(formatAccountLimitModel),
       pageSize: pageSize,
       pageNumber: pageNumber,
       totalItems: totalData.length,
@@ -85,7 +86,7 @@ export class AccountLimitService implements DatabaseServiceSchema<AccountLimit> 
       .from(accountLimits)
       .where(and(...conditions));
 
-    return limit;
+    return formatAccountLimitModel(limit);
   }
 
   async createSingle(payload: unknown): Promise<AccountLimit> {
@@ -98,7 +99,7 @@ export class AccountLimitService implements DatabaseServiceSchema<AccountLimit> 
 
     const [limit] = await db.insert(accountLimits).values(insertData).returning();
 
-    return limit;
+    return formatAccountLimitModel(limit);
   }
 
   async updateSingle(id: unknown, payload: unknown): Promise<AccountLimit> {
@@ -111,13 +112,13 @@ export class AccountLimitService implements DatabaseServiceSchema<AccountLimit> 
 
     const [limit] = await db.update(accountLimits).set(updateData).where(eq(accountLimits.id, idNum)).returning();
 
-    return limit;
+    return formatAccountLimitModel(limit);
   }
 
   async deleteSingle(id: unknown): Promise<AccountLimit> {
     const idNum = parseId(id);
     const [limit] = await db.delete(accountLimits).where(eq(accountLimits.id, idNum)).returning();
 
-    return limit;
+    return formatAccountLimitModel(limit);
   }
 }
