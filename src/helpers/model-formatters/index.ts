@@ -11,6 +11,7 @@ import {
   RefreshToken,
   Transaction,
   User,
+  UserPreference,
 } from '../../models/schema.ts';
 
 interface FieldFormatterConfig {
@@ -93,5 +94,11 @@ export function formatRecurrenceModel(item: Recurrence): Recurrence {
 export function formatRefreshTokenModel(item: RefreshToken): RefreshToken {
   return formatModelFields(item, {
     timestampFields: ['createdAt', 'expires', 'revokedAt'],
+  });
+}
+
+export function formatUserPreferenceModel(item: UserPreference): UserPreference {
+  return formatModelFields(item, {
+    timestampFields: ['createdAt', 'updatedAt'],
   });
 }

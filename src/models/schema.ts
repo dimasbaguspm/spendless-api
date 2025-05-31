@@ -107,6 +107,20 @@ export const transactions = pgTable('transactions', {
   updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
 });
 
+export const userPreferences = pgTable('user_preferences', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id')
+    .notNull()
+    .unique()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  monthlyStartDate: integer('monthly_start_date').notNull(), // Day of month (1-31)
+  weeklyStartDay: integer('weekly_start_day').notNull(), // 0=Sunday, 1=Monday, ..., 6=Saturday
+  limitPeriod: varchar('limit_period', { length: 20 }).notNull(), // 'weekly', 'monthly', 'annually'
+  categoryPeriod: varchar('category_period', { length: 20 }).notNull(), // 'weekly', 'monthly', 'annually'
+  createdAt: timestamp('created_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
+});
+
 // Define types
 export type Group = typeof groups.$inferSelect;
 export type PagedGroups = PaginatedResponse<Group>;
@@ -146,3 +160,8 @@ export type Transaction = typeof transactions.$inferSelect;
 export type PagedTransactions = PaginatedResponse<Transaction>;
 export type NewTransaction = typeof transactions.$inferInsert;
 export type UpdateTransaction = Partial<NewTransaction>;
+
+export type UserPreference = typeof userPreferences.$inferSelect;
+export type PagedUserPreferences = PaginatedResponse<UserPreference>;
+export type NewUserPreference = typeof userPreferences.$inferInsert;
+export type UpdateUserPreference = Partial<NewUserPreference>;

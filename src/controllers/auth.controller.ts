@@ -7,6 +7,7 @@ import { AccessTokenService } from '../services/authentication/access-token.serv
 import { PasswordService } from '../services/authentication/password.service.ts';
 import { RefreshTokenService } from '../services/authentication/refresh-token.service.ts';
 import { GroupService } from '../services/database/group.service.ts';
+import { UserPreferenceService } from '../services/database/user-preference.service.ts';
 import { UserService } from '../services/database/user.service.ts';
 
 const accessTokenService = new AccessTokenService();
@@ -14,6 +15,7 @@ const passwordService = new PasswordService();
 const userService = new UserService();
 const refreshTokenService = new RefreshTokenService();
 const groupService = new GroupService();
+const userPreferenceService = new UserPreferenceService();
 
 export async function registerUser(req: Request, res: Response) {
   try {
@@ -46,6 +48,9 @@ export async function registerUser(req: Request, res: Response) {
       password: passwordHash,
       groupId: createdGroup.id,
     });
+
+    // Create default user preferences
+    await userPreferenceService.createDefault(createdUser.id).catch(() => {});
 
     const token = accessTokenService.generateAccessToken(createdUser);
     const refreshToken = await refreshTokenService.generateRefreshToken(Number(createdUser.id));
