@@ -172,6 +172,38 @@ describe('AccountLimitValidationService', () => {
         validationService.validateTransactionAgainstLimits(1, 100, '2024-01-15T10:00:00Z', 1)
       ).rejects.toThrow('User preferences not found');
     });
+
+    it('should bypass validation for income transactions', async () => {
+      mockAccountLimitService.getMany.mockResolvedValue({ items: [mockWeeklyLimit] });
+
+      const result = await validationService.validateTransactionAgainstLimits(
+        1,
+        100000, // Large amount that would exceed any limit
+        '2024-01-15T10:00:00Z',
+        1,
+        'income'
+      );
+
+      expect(result.isValid).toBe(true);
+      expect(result.exceededLimits).toHaveLength(0);
+      expect(result.warnings).toHaveLength(0);
+    });
+
+    it('should bypass validation for transfer transactions', async () => {
+      mockAccountLimitService.getMany.mockResolvedValue({ items: [mockWeeklyLimit] });
+
+      const result = await validationService.validateTransactionAgainstLimits(
+        1,
+        100000, // Large amount that would exceed any limit
+        '2024-01-15T10:00:00Z',
+        1,
+        'transfer'
+      );
+
+      expect(result.isValid).toBe(true);
+      expect(result.exceededLimits).toHaveLength(0);
+      expect(result.warnings).toHaveLength(0);
+    });
   });
 
   describe('validateTransactionUpdateAgainstLimits', () => {
@@ -199,7 +231,7 @@ describe('AccountLimitValidationService', () => {
     });
 
     it('should return valid when transaction amount is decreasing', async () => {
-      const existingTransaction = { accountId: 1, amount: 200, date: '2024-01-15T10:00:00Z' };
+      const existingTransaction = { accountId: 1, amount: 200, date: '2024-01-15T10:00:00Z', type: 'expense' };
       const updatePayload = { amount: 150 }; // decreasing
 
       const result = await validationService.validateTransactionUpdateAgainstLimits(
@@ -214,7 +246,7 @@ describe('AccountLimitValidationService', () => {
     });
 
     it('should return valid when transaction amount stays the same', async () => {
-      const existingTransaction = { accountId: 1, amount: 200, date: '2024-01-15T10:00:00Z' };
+      const existingTransaction = { accountId: 1, amount: 200, date: '2024-01-15T10:00:00Z', type: 'expense' };
       const updatePayload = { amount: 200 }; // same amount
 
       const result = await validationService.validateTransactionUpdateAgainstLimits(
@@ -236,7 +268,7 @@ describe('AccountLimitValidationService', () => {
         }),
       });
 
-      const existingTransaction = { accountId: 1, amount: 200, date: '2024-01-15T10:00:00Z' };
+      const existingTransaction = { accountId: 1, amount: 200, date: '2024-01-15T10:00:00Z', type: 'expense' };
       const updatePayload = { amount: 350 }; // increase of 150
 
       const result = await validationService.validateTransactionUpdateAgainstLimits(
@@ -258,7 +290,7 @@ describe('AccountLimitValidationService', () => {
         }),
       });
 
-      const existingTransaction = { accountId: 1, amount: 100, date: '2024-01-15T10:00:00Z' };
+      const existingTransaction = { accountId: 1, amount: 100, date: '2024-01-15T10:00:00Z', type: 'expense' };
       const updatePayload = { amount: 250 }; // increase of 150
 
       const result = await validationService.validateTransactionUpdateAgainstLimits(
@@ -281,7 +313,7 @@ describe('AccountLimitValidationService', () => {
         }),
       });
 
-      const existingTransaction = { accountId: 1, amount: 200, date: '2024-01-15T10:00:00Z' };
+      const existingTransaction = { accountId: 1, amount: 200, date: '2024-01-15T10:00:00Z', type: 'expense' };
       const updatePayload = { accountId: 2, amount: 300 }; // different account
 
       const result = await validationService.validateTransactionUpdateAgainstLimits(
@@ -304,7 +336,7 @@ describe('AccountLimitValidationService', () => {
         }),
       });
 
-      const existingTransaction = { accountId: 1, amount: 150, date: '2024-01-15T10:00:00Z' };
+      const existingTransaction = { accountId: 1, amount: 150, date: '2024-01-15T10:00:00Z', type: 'expense' };
       const updatePayload = { amount: 250, date: '2024-01-16T10:00:00Z' }; // amount increase and date change
 
       const result = await validationService.validateTransactionUpdateAgainstLimits(
@@ -315,6 +347,36 @@ describe('AccountLimitValidationService', () => {
 
       // Should validate the difference (100) against the new date period
       expect(result.isValid).toBe(true);
+    });
+
+    it('should bypass validation for non-expense transactions', async () => {
+      const existingTransaction = { accountId: 1, amount: 100, date: '2024-01-15T10:00:00Z', type: 'income' };
+      const updatePayload = { amount: 1000000 }; // huge amount that would normally exceed any limit
+
+      const result = await validationService.validateTransactionUpdateAgainstLimits(
+        existingTransaction,
+        updatePayload,
+        1 // userId
+      );
+
+      // Should bypass validation for income transactions
+      expect(result.isValid).toBe(true);
+      expect(result.exceededLimits).toHaveLength(0);
+    });
+
+    it('should bypass validation when changing from expense to income', async () => {
+      const existingTransaction = { accountId: 1, amount: 100, date: '2024-01-15T10:00:00Z', type: 'expense' };
+      const updatePayload = { type: 'income' };
+
+      const result = await validationService.validateTransactionUpdateAgainstLimits(
+        existingTransaction,
+        updatePayload,
+        1 // userId
+      );
+
+      // Should bypass validation when changing to income type
+      expect(result.isValid).toBe(true);
+      expect(result.exceededLimits).toHaveLength(0);
     });
   });
 

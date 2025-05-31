@@ -1,0 +1,1 @@
+ALTER TABLE "transactions" ADD COLUMN "type" varchar(8) NOT NULL;

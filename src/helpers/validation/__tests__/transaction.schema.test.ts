@@ -15,6 +15,7 @@ describe('Transaction Schema Validation', () => {
         createdByUserId: 4,
         amount: 100.5,
         currency: 'USD',
+        type: 'expense',
         date: '2024-05-24',
         note: 'Test transaction',
         recurrenceId: 5,
@@ -34,6 +35,7 @@ describe('Transaction Schema Validation', () => {
         createdByUserId: 4,
         amount: 100,
         currency: 'EUR',
+        type: 'income',
         date: '2024-05-24',
       };
 
@@ -51,6 +53,7 @@ describe('Transaction Schema Validation', () => {
         createdByUserId: 4,
         amount: 123.45,
         currency: 'USD',
+        type: 'transfer',
         date: '2024-05-24',
       };
 

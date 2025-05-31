@@ -53,6 +53,7 @@ describe('TransactionService', () => {
     categoryId: 1,
     createdByUserId: 1,
     amount: 100.5,
+    type: 'expense',
     currency: 'USD',
     date: '2024-05-24T00:00:00.000Z',
     note: 'Test transaction',

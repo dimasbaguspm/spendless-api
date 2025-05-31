@@ -284,6 +284,12 @@ const options: swaggerJSDoc.Options = {
               description: 'Currency code (3 characters)',
               example: 'USD',
             },
+            type: {
+              type: 'string',
+              enum: ['expense', 'income', 'transfer'],
+              description: 'Transaction type',
+              example: 'expense',
+            },
             date: {
               type: 'string',
               format: 'date-time',
@@ -945,7 +951,7 @@ const options: swaggerJSDoc.Options = {
         },
         NewTransaction: {
           type: 'object',
-          required: ['groupId', 'accountId', 'categoryId', 'createdByUserId', 'amount', 'currency', 'date'],
+          required: ['groupId', 'accountId', 'categoryId', 'createdByUserId', 'amount', 'currency', 'type', 'date'],
           properties: {
             groupId: {
               type: 'integer',
@@ -975,6 +981,12 @@ const options: swaggerJSDoc.Options = {
               maxLength: 3,
               description: 'Currency code (3 characters)',
               example: 'USD',
+            },
+            type: {
+              type: 'string',
+              enum: ['expense', 'income', 'transfer'],
+              description: 'Transaction type',
+              example: 'expense',
             },
             date: {
               type: 'string',
@@ -1025,6 +1037,12 @@ const options: swaggerJSDoc.Options = {
               maxLength: 3,
               description: 'Currency code (3 characters)',
               example: 'USD',
+            },
+            type: {
+              type: 'string',
+              enum: ['expense', 'income', 'transfer'],
+              description: 'Transaction type',
+              example: 'expense',
             },
             date: {
               type: 'string',

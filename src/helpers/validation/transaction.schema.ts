@@ -11,6 +11,9 @@ export const createTransactionSchema = z.object({
   createdByUserId: z.number().int().positive('Created by User ID is required'),
   amount: z.number().positive('Amount must be a positive number'),
   currency: z.string().length(3, 'Currency code must be 3 characters'),
+  type: z.string().refine((val) => ['expense', 'income', 'transfer'].includes(val), {
+    message: 'Transaction type must be one of: expense, income, transfer',
+  }),
   date: z.string(), // DB is date, accept string (ISO)
   note: z.string().nullable().optional(),
   recurrenceId: z.number().int().nullable().optional(), // nullable in DB, so optional here
@@ -40,6 +43,13 @@ export const transactionQuerySchema = z.object({
     .optional()
     .refine((val) => val === undefined || !isNaN(new Date(val).getTime()), { message: 'Invalid end date format' }),
   currency: z.string().length(3).optional(),
+  type: z
+    .string()
+    .optional()
+    .transform((val) => (val === '' ? undefined : val))
+    .refine((val) => val === undefined || ['expense', 'income', 'transfer'].includes(val), {
+      message: 'Transaction type must be one of: expense, income, transfer',
+    }),
   recurrenceId: z.number().int().positive().optional(),
   pageNumber: z.coerce.number().min(1).optional().default(1),
   pageSize: z.coerce.number().min(1).optional().default(25),
