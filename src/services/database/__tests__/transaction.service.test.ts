@@ -52,6 +52,7 @@ describe('TransactionService', () => {
     accountId: 1,
     categoryId: 1,
     createdByUserId: 1,
+    isHighlighted: false,
     amount: 100.5,
     type: 'expense',
     currency: 'USD',

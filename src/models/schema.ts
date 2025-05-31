@@ -102,6 +102,7 @@ export const transactions = pgTable('transactions', {
   type: varchar('type', { length: 8 }).notNull(), // 'expense', 'income', 'transfer'
   date: timestamp('date', { mode: 'string', withTimezone: true }).$type<string>().notNull(), // date of the transaction
   note: text('note'),
+  isHighlighted: boolean('is_highlighted').default(false).notNull(),
   recurrenceId: integer('recurrence_id')
     .$type<number>()
     .references(() => recurrences.id),

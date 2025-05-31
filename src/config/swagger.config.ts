@@ -310,6 +310,12 @@ const options: swaggerJSDoc.Options = {
               nullable: true,
               description: 'Recurrence pattern ID if this is a recurring transaction',
             },
+            isHighlighted: {
+              type: 'boolean',
+              description: 'Whether the transaction is marked as highlighted/important',
+              example: false,
+              default: false,
+            },
             createdAt: {
               type: 'string',
               format: 'date-time',
@@ -1017,6 +1023,12 @@ const options: swaggerJSDoc.Options = {
               nullable: true,
               description: 'Recurrence pattern ID if this is a recurring transaction',
             },
+            isHighlighted: {
+              type: 'boolean',
+              description: 'Whether the transaction is marked as highlighted/important',
+              example: false,
+              default: false,
+            },
           },
         },
         UpdateTransaction: {
@@ -1072,6 +1084,12 @@ const options: swaggerJSDoc.Options = {
               type: 'integer',
               nullable: true,
               description: 'Recurrence pattern ID if this is a recurring transaction',
+            },
+            isHighlighted: {
+              type: 'boolean',
+              description: 'Whether the transaction is marked as highlighted/important',
+              example: false,
+              default: false,
             },
           },
         },
@@ -1348,6 +1366,11 @@ const options: swaggerJSDoc.Options = {
                   type: 'string',
                   enum: ['date', 'amount', 'createdAt'],
                   description: 'Field to sort by',
+                },
+                isHighlighted: {
+                  type: 'boolean',
+                  description: 'Filter by highlighted status',
+                  example: true,
                 },
               },
             },
