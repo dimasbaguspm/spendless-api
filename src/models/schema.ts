@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, timestamp, text, boolean, integer, decimal } from 'drizzle-orm/pg-core';
+import { pgTable, serial, varchar, timestamp, text, boolean, integer, decimal, json } from 'drizzle-orm/pg-core';
 
 import { PaginatedResponse } from '../types/index.ts';
 
@@ -32,6 +32,7 @@ export const accounts = pgTable('accounts', {
   name: varchar('name', { length: 255 }).notNull(),
   type: varchar('type', { length: 50 }).notNull(), // debit, credit, etc.
   note: text('note'),
+  metadata: json('metadata').$type<Record<string, any>>(),
   createdAt: timestamp('created_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
 });
@@ -67,6 +68,7 @@ export const categories = pgTable('categories', {
   parentId: integer('parent_id'), // nullable, for nested categories
   name: varchar('name', { length: 100 }).notNull(),
   note: text('note'),
+  metadata: json('metadata').$type<Record<string, any>>(),
   createdAt: timestamp('created_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
 });

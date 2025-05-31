@@ -101,6 +101,132 @@ describe('Category Schema Validation', () => {
       expect(result.success).toBe(true);
       expect(result.data?.name).toBe('a'.repeat(100));
     });
+
+    describe('metadata field validation', () => {
+      it('should accept null metadata', () => {
+        const validData = {
+          groupId: 1,
+          name: 'Test Category',
+          metadata: null,
+        };
+
+        const result = createCategorySchema.safeParse(validData);
+
+        expect(result.success).toBe(true);
+        expect(result.data?.metadata).toBeNull();
+      });
+
+      it('should accept undefined metadata', () => {
+        const validData = {
+          groupId: 1,
+          name: 'Test Category',
+          metadata: undefined,
+        };
+
+        const result = createCategorySchema.safeParse(validData);
+
+        expect(result.success).toBe(true);
+        expect(result.data?.metadata).toBeUndefined();
+      });
+
+      it('should accept empty object metadata', () => {
+        const validData = {
+          groupId: 1,
+          name: 'Test Category',
+          metadata: {},
+        };
+
+        const result = createCategorySchema.safeParse(validData);
+
+        expect(result.success).toBe(true);
+        expect(result.data?.metadata).toEqual({});
+      });
+
+      it('should accept metadata with any object keys and values', () => {
+        const validData = {
+          groupId: 1,
+          name: 'Test Category',
+          metadata: {
+            categoryType: 'expense',
+            color: '#FF5733',
+            icon: 'shopping-cart',
+            priority: 'high',
+            settings: {
+              budgetEnabled: true,
+              budgetLimit: 1500,
+              notifications: ['weekly', 'monthly'],
+              subcategories: ['groceries', 'dining'],
+            },
+            tags: ['essential', 'recurring'],
+            analytics: {
+              tracking: {
+                enabled: true,
+                period: 'monthly',
+                metrics: ['amount', 'frequency', 'trends'],
+              },
+            },
+          },
+        };
+
+        const result = createCategorySchema.safeParse(validData);
+
+        expect(result.success).toBe(true);
+        expect(result.data?.metadata).toEqual(validData.metadata);
+      });
+
+      it('should accept metadata with mixed data types', () => {
+        const validData = {
+          groupId: 1,
+          name: 'Test Category',
+          metadata: {
+            stringValue: 'text',
+            numberValue: 42,
+            booleanValue: true,
+            arrayValue: [1, 'two', { three: 3 }],
+            objectValue: { nested: 'value' },
+            nullValue: null,
+          },
+        };
+
+        const result = createCategorySchema.safeParse(validData);
+
+        expect(result.success).toBe(true);
+        expect(result.data?.metadata).toEqual(validData.metadata);
+      });
+
+      it('should default to null when metadata is not provided', () => {
+        const validData = {
+          groupId: 1,
+          name: 'Test Category',
+        };
+
+        const result = createCategorySchema.safeParse(validData);
+
+        expect(result.success).toBe(true);
+        expect(result.data?.metadata).toBeUndefined();
+      });
+
+      it('should accept metadata with arbitrary property names', () => {
+        const validData = {
+          groupId: 1,
+          name: 'Test Category',
+          metadata: {
+            'custom-field': 'hyphenated key',
+            'special@email': 'special characters',
+            '123numeric': 'numeric start',
+            unicodeKey: 'unicode characters',
+            'very.long.dotted.key.name': 'dotted notation',
+            UPPERCASE: 'caps key',
+            MiXeD_CaSe: 'mixed case with underscore',
+          },
+        };
+
+        const result = createCategorySchema.safeParse(validData);
+
+        expect(result.success).toBe(true);
+        expect(result.data?.metadata).toEqual(validData.metadata);
+      });
+    });
   });
 
   describe('updateCategorySchema', () => {
@@ -162,6 +288,77 @@ describe('Category Schema Validation', () => {
           }),
         ])
       );
+    });
+
+    describe('metadata field validation in updates', () => {
+      it('should accept null metadata in updates', () => {
+        const validData = {
+          name: 'Updated Category',
+          metadata: null,
+        };
+
+        const result = updateCategorySchema.safeParse(validData);
+
+        expect(result.success).toBe(true);
+        expect(result.data?.metadata).toBeNull();
+      });
+
+      it('should accept undefined metadata in updates', () => {
+        const validData = {
+          name: 'Updated Category',
+          metadata: undefined,
+        };
+
+        const result = updateCategorySchema.safeParse(validData);
+
+        expect(result.success).toBe(true);
+        expect(result.data?.metadata).toBeUndefined(); // defaults to null
+      });
+
+      it('should accept complex metadata updates', () => {
+        const validData = {
+          metadata: {
+            updated: true,
+            timestamp: Date.now(),
+            changes: ['name', 'parentId'],
+            auditLog: {
+              updatedBy: 'user123',
+              reason: 'Category restructuring',
+              previousValues: {
+                name: 'Old Category Name',
+                parentId: 1,
+              },
+            },
+            version: 2,
+          },
+        };
+
+        const result = updateCategorySchema.safeParse(validData);
+
+        expect(result.success).toBe(true);
+        expect(result.data?.metadata).toEqual(validData.metadata);
+      });
+
+      it('should accept metadata with category-specific fields in updates', () => {
+        const validData = {
+          metadata: {
+            categoryType: 'income',
+            color: '#28A745',
+            icon: 'dollar-sign',
+            budgetSettings: {
+              enabled: false,
+              limit: null,
+              notifications: [],
+            },
+            trackingEnabled: true,
+          },
+        };
+
+        const result = updateCategorySchema.safeParse(validData);
+
+        expect(result.success).toBe(true);
+        expect(result.data?.metadata).toEqual(validData.metadata);
+      });
     });
   });
 

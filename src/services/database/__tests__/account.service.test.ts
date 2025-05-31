@@ -47,6 +47,7 @@ describe('AccountService', () => {
     groupId: 1,
     name: 'Test Account',
     type: 'checking',
+    metadata: null,
     note: 'Test account note',
     createdAt: '2024-01-01T00:00:00.000Z',
     updatedAt: '2024-01-01T00:00:00.000Z',

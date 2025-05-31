@@ -8,6 +8,7 @@ describe('Account Schema Validation', () => {
         name: 'Test Account',
         type: 'checking',
         note: 'Test note',
+        metadata: null,
       };
 
       const result = createAccountSchema.safeParse(validData);
@@ -21,6 +22,7 @@ describe('Account Schema Validation', () => {
         groupId: 1,
         name: 'Test Account',
         type: 'savings',
+        metadata: null,
       };
 
       const result = createAccountSchema.safeParse(validData);
@@ -112,6 +114,136 @@ describe('Account Schema Validation', () => {
         ])
       );
     });
+
+    describe('metadata field validation', () => {
+      it('should accept null metadata', () => {
+        const validData = {
+          groupId: 1,
+          name: 'Test Account',
+          type: 'checking',
+          metadata: null,
+        };
+
+        const result = createAccountSchema.safeParse(validData);
+
+        expect(result.success).toBe(true);
+        expect(result.data?.metadata).toBeNull();
+      });
+
+      it('should accept undefined metadata', () => {
+        const validData = {
+          groupId: 1,
+          name: 'Test Account',
+          type: 'checking',
+          metadata: undefined,
+        };
+
+        const result = createAccountSchema.safeParse(validData);
+
+        expect(result.success).toBe(true);
+        expect(result.data?.metadata).toBeUndefined();
+      });
+
+      it('should accept empty object metadata', () => {
+        const validData = {
+          groupId: 1,
+          name: 'Test Account',
+          type: 'checking',
+          metadata: {},
+        };
+
+        const result = createAccountSchema.safeParse(validData);
+
+        expect(result.success).toBe(true);
+        expect(result.data?.metadata).toEqual({});
+      });
+
+      it('should accept metadata with any object keys and values', () => {
+        const validData = {
+          groupId: 1,
+          name: 'Test Account',
+          type: 'checking',
+          metadata: {
+            bankCode: 'ABC123',
+            accountNumber: '1234567890',
+            branch: 'Main Branch',
+            settings: {
+              enableNotifications: true,
+              dailyLimit: 5000,
+              currencies: ['USD', 'EUR', 'GBP'],
+            },
+            customField: 'any value',
+            nestedObject: {
+              level1: {
+                level2: {
+                  data: 'deep nested value',
+                  array: [1, 2, 3, 'string', { key: 'value' }],
+                },
+              },
+            },
+          },
+        };
+
+        const result = createAccountSchema.safeParse(validData);
+
+        expect(result.success).toBe(true);
+        expect(result.data?.metadata).toEqual(validData.metadata);
+      });
+
+      it('should accept metadata with mixed data types', () => {
+        const validData = {
+          groupId: 1,
+          name: 'Test Account',
+          type: 'checking',
+          metadata: {
+            stringValue: 'text',
+            numberValue: 42,
+            booleanValue: true,
+            arrayValue: [1, 'two', { three: 3 }],
+            objectValue: { nested: 'value' },
+            nullValue: null,
+          },
+        };
+
+        const result = createAccountSchema.safeParse(validData);
+
+        expect(result.success).toBe(true);
+        expect(result.data?.metadata).toEqual(validData.metadata);
+      });
+
+      it('should default to null when metadata is not provided', () => {
+        const validData = {
+          groupId: 1,
+          name: 'Test Account',
+          type: 'checking',
+        };
+
+        const result = createAccountSchema.safeParse(validData);
+
+        expect(result.success).toBe(true);
+        expect(result.data?.metadata).toBeUndefined();
+      });
+
+      it('should accept metadata with arbitrary property names', () => {
+        const validData = {
+          groupId: 1,
+          name: 'Test Account',
+          type: 'checking',
+          metadata: {
+            'custom-field': 'hyphenated key',
+            'special@email': 'special characters',
+            '123numeric': 'numeric start',
+            unicodeKey: 'unicode characters',
+            'very.long.dotted.key.name': 'dotted notation',
+          },
+        };
+
+        const result = createAccountSchema.safeParse(validData);
+
+        expect(result.success).toBe(true);
+        expect(result.data?.metadata).toEqual(validData.metadata);
+      });
+    });
   });
 
   describe('updateAccountSchema', () => {
@@ -144,6 +276,39 @@ describe('Account Schema Validation', () => {
 
       expect(result.success).toBe(true);
       expect(result.data).toEqual({});
+    });
+
+    describe('metadata field validation in updates', () => {
+      it('should accept null metadata in updates', () => {
+        const validData = {
+          name: 'Updated Account',
+          metadata: null,
+        };
+
+        const result = updateAccountSchema.safeParse(validData);
+
+        expect(result.success).toBe(true);
+        expect(result.data?.metadata).toBeNull();
+      });
+
+      it('should accept complex metadata updates', () => {
+        const validData = {
+          metadata: {
+            updated: true,
+            timestamp: Date.now(),
+            changes: ['name', 'type'],
+            auditLog: {
+              updatedBy: 'user123',
+              reason: 'Account restructuring',
+            },
+          },
+        };
+
+        const result = updateAccountSchema.safeParse(validData);
+
+        expect(result.success).toBe(true);
+        expect(result.data?.metadata).toEqual(validData.metadata);
+      });
     });
   });
 

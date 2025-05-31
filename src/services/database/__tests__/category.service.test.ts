@@ -47,6 +47,7 @@ describe('CategoryService', () => {
     id: 1,
     groupId: 1,
     parentId: null,
+    metadata: null,
     name: 'Test Category',
     note: 'Test category note',
     createdAt: '2024-06-01T12:00:00.000Z',
