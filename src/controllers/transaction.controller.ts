@@ -7,11 +7,13 @@ import { AccessTokenService } from '../services/authentication/access-token.serv
 import { AccountService } from '../services/database/account.service.ts';
 import { CategoryService } from '../services/database/category.service.ts';
 import { TransactionService } from '../services/database/transaction.service.ts';
+import { AccountLimitValidationService } from '../services/validation/account-limit-validation.service.ts';
 
 const accessTokenService = new AccessTokenService();
 const transactionService = new TransactionService();
 const accountService = new AccountService();
 const categoryService = new CategoryService();
+const accountLimitValidationService = new AccountLimitValidationService();
 
 export async function listTransactions(req: Request, res: Response) {
   try {
@@ -54,6 +56,24 @@ export async function createTransaction(req: Request, res: Response) {
       if (!category) {
         throw new BadRequestException('Invalid category ID');
       }
+    }
+
+    // Validate against account limits for new transaction
+    const validationResult = await accountLimitValidationService.validateTransactionAgainstLimits(
+      payload.accountId as number,
+      payload.amount as number,
+      payload.date as string,
+      user.id
+    );
+
+    if (!validationResult.isValid) {
+      const limitErrors = validationResult.exceededLimits.map((exceeded) => {
+        const period = exceeded.limit.period;
+        const periodText = period === 'week' ? 'weekly' : 'monthly';
+        return `${periodText} limit of ${exceeded.limit.limit} would be exceeded. Current spent: ${exceeded.currentSpent}, Available: ${exceeded.remainingAmount}`;
+      });
+
+      throw new BadRequestException(`Transaction would exceed account limits: ${limitErrors.join('; ')}`);
     }
 
     const transaction = await transactionService.createSingle(payload);
@@ -117,9 +137,32 @@ export async function updateTransaction(req: Request, res: Response) {
       }
     }
 
-    const transaction = await transactionService.updateSingle(id, payload);
+    // Validate against account limits if amount, account, or date is being updated
+    if (payload?.amount !== undefined || payload?.accountId !== undefined || payload?.date !== undefined) {
+      const validationResult = await accountLimitValidationService.validateTransactionUpdateAgainstLimits(
+        existingTransaction,
+        payload,
+        user.id
+      );
 
-    res.status(200).json(transaction);
+      if (!validationResult.isValid) {
+        const limitErrors = validationResult.exceededLimits.map((exceeded) => {
+          const period = exceeded.limit.period;
+          const periodText = period === 'week' ? 'weekly' : 'monthly';
+          return `${periodText} limit of ${exceeded.limit.limit} would be exceeded. Current spent: ${exceeded.currentSpent}, Available: ${exceeded.remainingAmount}`;
+        });
+
+        throw new BadRequestException(`Transaction update would exceed account limits: ${limitErrors.join('; ')}`);
+      }
+
+      const transaction = await transactionService.updateSingle(id, payload);
+
+      res.status(200).json(transaction);
+    } else {
+      // No fields that affect limits are being updated
+      const transaction = await transactionService.updateSingle(id, payload);
+      res.status(200).json(transaction);
+    }
   } catch (err) {
     getErrorResponse(res, err);
   }
