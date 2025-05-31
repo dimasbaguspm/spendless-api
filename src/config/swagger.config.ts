@@ -120,6 +120,10 @@ const options: swaggerJSDoc.Options = {
               type: 'boolean',
               description: 'Whether the user is active',
             },
+            isOnboard: {
+              type: 'boolean',
+              description: 'Whether the user has completed the onboarding process',
+            },
             createdAt: {
               type: 'string',
               format: 'date-time',
@@ -619,7 +623,7 @@ const options: swaggerJSDoc.Options = {
         },
         NewUser: {
           type: 'object',
-          required: ['groupId', 'email', 'passwordHash', 'name', 'isActive'],
+          required: ['groupId', 'email', 'passwordHash', 'name', 'isActive', 'isOnboard'],
           properties: {
             groupId: {
               type: 'integer',
@@ -644,6 +648,11 @@ const options: swaggerJSDoc.Options = {
             isActive: {
               type: 'boolean',
               description: 'Whether the user is active',
+            },
+            isOnboard: {
+              type: 'boolean',
+              description: 'Whether the user has completed the onboarding process',
+              default: false,
             },
           },
         },
@@ -673,6 +682,10 @@ const options: swaggerJSDoc.Options = {
             isActive: {
               type: 'boolean',
               description: 'Whether the user is active',
+            },
+            isOnboard: {
+              type: 'boolean',
+              description: 'Whether the user has completed the onboarding process',
             },
           },
         },
@@ -1179,6 +1192,10 @@ const options: swaggerJSDoc.Options = {
                 isActive: {
                   type: 'boolean',
                   description: 'Filter by active status',
+                },
+                isOnboard: {
+                  type: 'boolean',
+                  description: 'Filter by onboarding status',
                 },
                 sortBy: {
                   type: 'string',
