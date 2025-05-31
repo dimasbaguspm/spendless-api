@@ -54,7 +54,7 @@ describe('TransactionService', () => {
     createdByUserId: 1,
     amount: 100.5,
     currency: 'USD',
-    date: '2024-05-24',
+    date: '2024-05-24T00:00:00.000Z',
     note: 'Test transaction',
     recurrenceId: null,
     createdAt: '2024-01-01T00:00:00.000Z',

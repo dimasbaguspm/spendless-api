@@ -49,10 +49,10 @@ describe('RecurrenceService', () => {
     id: 1,
     frequency: 'monthly',
     interval: 1,
-    nextOccurrenceDate: '2024-06-01',
-    endDate: '2024-12-31',
-    createdAt: '2024-01-01T00:00:00.000Z',
-    updatedAt: '2024-01-01T00:00:00.000Z',
+    nextOccurrenceDate: '2024-06-01T12:00:00.000Z',
+    endDate: '2024-06-01T12:00:00.000Z',
+    createdAt: '2024-06-01T12:00:00.000Z',
+    updatedAt: '2024-06-01T12:00:00.000Z',
   };
 
   const mockPagedRecurrences: PagedRecurrences = {
@@ -283,7 +283,7 @@ describe('RecurrenceService', () => {
       const updateData = {
         frequency: 'yearly',
         interval: 3,
-        nextOccurrenceDate: '2024-07-01',
+        nextOccurrenceDate: '2024-06-01T12:00:00.000Z',
       };
 
       mockValidate.mockResolvedValue({ data: updateData });

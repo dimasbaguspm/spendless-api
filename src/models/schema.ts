@@ -6,8 +6,8 @@ export const groups = pgTable('groups', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 255 }).notNull(),
   defaultCurrency: varchar('default_currency', { length: 3 }).notNull(),
-  createdAt: timestamp('created_at', { mode: 'date' }).$type<string>().defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { mode: 'date' }).$type<string>().defaultNow().notNull(),
+  createdAt: timestamp('created_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
 });
 
 export const users = pgTable('users', {
@@ -19,8 +19,8 @@ export const users = pgTable('users', {
   passwordHash: varchar('password_hash', { length: 255 }).notNull(),
   name: varchar('name', { length: 255 }).notNull(),
   isActive: boolean('is_active').notNull(),
-  createdAt: timestamp('created_at', { mode: 'date' }).$type<string>().defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { mode: 'date' }).$type<string>().defaultNow().notNull(),
+  createdAt: timestamp('created_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
 });
 
 export const accounts = pgTable('accounts', {
@@ -31,8 +31,8 @@ export const accounts = pgTable('accounts', {
   name: varchar('name', { length: 255 }).notNull(),
   type: varchar('type', { length: 50 }).notNull(), // debit, credit, etc.
   note: text('note'),
-  createdAt: timestamp('created_at', { mode: 'date' }).$type<string>().defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { mode: 'date' }).$type<string>().defaultNow().notNull(),
+  createdAt: timestamp('created_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
 });
 
 export const accountLimits = pgTable('account_limits', {
@@ -42,8 +42,8 @@ export const accountLimits = pgTable('account_limits', {
     .references(() => accounts.id, { onDelete: 'cascade' }),
   period: varchar('period', { length: 20 }).notNull(), // 'month' or 'week'
   limit: decimal('limit', { precision: 14, scale: 2 }).$type<number>().notNull(),
-  createdAt: timestamp('created_at', { mode: 'date' }).$type<string>().defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { mode: 'date' }).$type<string>().defaultNow().notNull(),
+  createdAt: timestamp('created_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
 });
 
 export const refreshTokens = pgTable('refresh_tokens', {
@@ -52,9 +52,9 @@ export const refreshTokens = pgTable('refresh_tokens', {
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   token: text('token').notNull().unique(),
-  expires: timestamp('expires', { mode: 'date' }).$type<string>().notNull(),
-  createdAt: timestamp('created_at', { mode: 'date' }).$type<string>().defaultNow().notNull(),
-  revokedAt: timestamp('revoked_at', { mode: 'date' }).$type<string>(),
+  expires: timestamp('expires', { mode: 'string', withTimezone: true }).$type<string>().notNull(),
+  createdAt: timestamp('created_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
+  revokedAt: timestamp('revoked_at', { mode: 'string', withTimezone: true }).$type<string>(),
   replacedByToken: text('replaced_by_token'),
 });
 
@@ -66,18 +66,20 @@ export const categories = pgTable('categories', {
   parentId: integer('parent_id'), // nullable, for nested categories
   name: varchar('name', { length: 100 }).notNull(),
   note: text('note'),
-  createdAt: timestamp('created_at', { mode: 'date' }).$type<string>().defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { mode: 'date' }).$type<string>().defaultNow().notNull(),
+  createdAt: timestamp('created_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
 });
 
 export const recurrences = pgTable('recurrences', {
   id: serial('id').primaryKey(),
   frequency: varchar('frequency', { length: 20 }).notNull(), // daily, weekly, monthly, yearly
   interval: integer('interval').notNull(),
-  nextOccurrenceDate: timestamp('next_occurrence_date', { mode: 'date' }).$type<string>().notNull(),
-  endDate: timestamp('end_date', { mode: 'date' }).$type<string>(),
-  createdAt: timestamp('created_at', { mode: 'date' }).$type<string>().defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { mode: 'date' }).$type<string>().defaultNow().notNull(),
+  nextOccurrenceDate: timestamp('next_occurrence_date', { mode: 'string', withTimezone: true })
+    .$type<string>()
+    .notNull(),
+  endDate: timestamp('end_date', { mode: 'string', withTimezone: true }).$type<string>(),
+  createdAt: timestamp('created_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
 });
 
 export const transactions = pgTable('transactions', {
@@ -96,13 +98,13 @@ export const transactions = pgTable('transactions', {
     .references(() => users.id),
   amount: decimal('amount', { precision: 14, scale: 2 }).$type<number>().notNull(),
   currency: varchar('currency', { length: 3 }).notNull(),
-  date: timestamp('date', { mode: 'date' }).$type<string>().notNull(), // date of the transaction
+  date: timestamp('date', { mode: 'string', withTimezone: true }).$type<string>().notNull(), // date of the transaction
   note: text('note'),
   recurrenceId: integer('recurrence_id')
     .$type<number>()
     .references(() => recurrences.id),
-  createdAt: timestamp('created_at', { mode: 'date' }).$type<string>().defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { mode: 'date' }).$type<string>().defaultNow().notNull(),
+  createdAt: timestamp('created_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true }).$type<string>().defaultNow().notNull(),
 });
 
 // Define types

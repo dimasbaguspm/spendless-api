@@ -49,8 +49,8 @@ describe('CategoryService', () => {
     parentId: null,
     name: 'Test Category',
     note: 'Test category note',
-    createdAt: '2024-01-01T00:00:00.000Z',
-    updatedAt: '2024-01-01T00:00:00.000Z',
+    createdAt: '2024-06-01T12:00:00.000Z',
+    updatedAt: '2024-06-01T12:00:00.000Z',
   };
 
   const mockPagedCategories: PagedCategories = {

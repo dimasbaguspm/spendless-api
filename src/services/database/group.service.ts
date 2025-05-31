@@ -1,6 +1,7 @@
 import { eq, and, asc, desc, SQL } from 'drizzle-orm';
 
 import { db } from '../../core/db/config.ts';
+import { formatGroupModel } from '../../helpers/model-formatters/index.ts';
 import { parseId } from '../../helpers/parsers/index.ts';
 import { groupQuerySchema, createGroupSchema, updateGroupSchema } from '../../helpers/validation/group.schema.ts';
 import { validate } from '../../helpers/validation/index.ts';
@@ -50,7 +51,7 @@ export class GroupService implements DatabaseServiceSchema<Group> {
     const [pagedData, totalData] = await Promise.all([pagedQuery.execute(), totalQuery.execute()]);
 
     return {
-      items: pagedData,
+      items: pagedData.map(formatGroupModel),
       pageSize: pageSize,
       pageNumber: pageNumber,
       totalItems: totalData.length,
@@ -74,7 +75,7 @@ export class GroupService implements DatabaseServiceSchema<Group> {
       .select()
       .from(groups)
       .where(and(...conditions));
-    return group;
+    return formatGroupModel(group);
   }
 
   /**
@@ -95,7 +96,7 @@ export class GroupService implements DatabaseServiceSchema<Group> {
         defaultCurrency: insertData.defaultCurrency,
       })
       .returning();
-    return group;
+    return formatGroupModel(group);
   }
 
   /**
@@ -109,7 +110,7 @@ export class GroupService implements DatabaseServiceSchema<Group> {
       .set({ ...data, updatedAt: new Date().toISOString() })
       .where(eq(groups.id, idNum))
       .returning();
-    return group;
+    return formatGroupModel(group);
   }
 
   /**
@@ -118,6 +119,6 @@ export class GroupService implements DatabaseServiceSchema<Group> {
   async deleteSingle(id: unknown) {
     const idNum = parseId(id);
     const [group] = await db.delete(groups).where(eq(groups.id, idNum)).returning();
-    return group;
+    return formatGroupModel(group);
   }
 }

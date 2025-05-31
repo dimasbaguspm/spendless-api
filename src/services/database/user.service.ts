@@ -1,6 +1,7 @@
 import { eq, and, asc, desc, SQL } from 'drizzle-orm';
 
 import { db } from '../../core/db/config.ts';
+import { formatUserModel } from '../../helpers/model-formatters/index.ts';
 import { parseId } from '../../helpers/parsers/index.ts';
 import { registerSchema } from '../../helpers/validation/auth.schema.ts';
 import { updateUserSchema, userQuerySchema, validate } from '../../helpers/validation/index.ts';
@@ -68,7 +69,7 @@ export class UserService implements DatabaseServiceSchema<User> {
     const [pagedData, totalData] = await Promise.all([pagedQuery.execute(), totalQuery.execute()]);
 
     return {
-      items: pagedData,
+      items: pagedData.map(formatUserModel),
       pageSize: pageSize,
       pageNumber: pageNumber,
       totalItems: totalData.length,
@@ -95,7 +96,7 @@ export class UserService implements DatabaseServiceSchema<User> {
       .select()
       .from(users)
       .where(and(...conditions));
-    return user;
+    return formatUserModel(user);
   }
 
   /**
@@ -113,7 +114,7 @@ export class UserService implements DatabaseServiceSchema<User> {
         isActive: false,
       })
       .returning();
-    return user;
+    return formatUserModel(user);
   }
 
   /**
@@ -132,7 +133,7 @@ export class UserService implements DatabaseServiceSchema<User> {
       })
       .where(eq(users.id, idNum))
       .returning();
-    return user;
+    return formatUserModel(user);
   }
 
   /**
@@ -141,6 +142,6 @@ export class UserService implements DatabaseServiceSchema<User> {
   async deleteSingle(id: unknown) {
     const idNum = parseId(id);
     const [user] = await db.delete(users).where(eq(users.id, idNum)).returning();
-    return user;
+    return formatUserModel(user);
   }
 }
